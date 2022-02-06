@@ -263,7 +263,7 @@ uint64_t System::get_phys_page() {
     return page_no;
 }
 
-#define VM_DEBUG 0
+#define VM_DEBUG 1
 
 uint64_t System::get_pte(uint64_t base_addr, int vpn, bool isleaf, bool& allocated) {
     uint64_t addr = base_addr + vpn*8;
@@ -319,7 +319,7 @@ uint64_t System::virt_to_phy(const uint64_t virt_addr) {
 
 void System::load_segment(const int fd, const size_t memsz, const size_t filesz, uint64_t virt_addr) {
     if (VM_DEBUG) cout << "Read " << std::dec << filesz << " bytes at " << std::hex << virt_addr << endl;
-    for(size_t i = 0; i < memsz; ++i) assert(virt_to_phy(virt_addr + i)); // prefault
+    for(size_t i = 0; i < memsz; ++i) assert(virt_to_phy(virt_addr + i) || (!use_virtual_memory && !virt_addr)); // prefault, 
     assert(filesz == read(fd, &ram_virt[virt_addr], filesz));
 }
 
