@@ -28,14 +28,14 @@ extern "C" {
         if (pending_writes.size() > MAX_PENDING_WRITES) {
             for(int i = 0; i < MAX_PENDING_WRITES/10; ++i) {
                 auto pw = pending_writes.begin();
-                if (DEBUG_WRITES) cerr << "(Overflow) Merging in pending write for address 0x" << std::hex << pw->first << " value 0x" << (int)((char)(pw->second)) << std::endl;
+                if (DEBUG_WRITES) cerr << "(Overflow) Merging in pending write for address 0x" << std::hex << pw->first << " value 0x" << (int)((char)(pw->second)) << endl;
                 System::sys->ram[pw->first] = pw->second;
                 pending_writes.erase(pw);
             }
         }
         for(int ofs = 0; ofs < size; ++ofs) {
             pending_writes[addr+ofs] = (char)val;
-            if (DEBUG_WRITES) cerr << "Received pending write for address 0x" << std::hex << (addr+ofs) << " value 0x" << (int)(val) << std::endl;
+            if (DEBUG_WRITES) cerr << "Received pending write for address 0x" << std::hex << (addr+ofs) << " value 0x" << (int)(val) << endl;
             val >>= 8;
         }
     }
@@ -59,7 +59,11 @@ extern "C" {
             return;
 
         case __NR_mmap:
-            assert(a0 == 0 && (a3 & MAP_ANONYMOUS)); // only support ANONYMOUS mmap with NULL argument
+            if (!(a0 == 0 && (a3 & MAP_ANONYMOUS))) { // only support ANONYMOUS mmap with NULL argument
+                cerr << "Simulator does not support mmap() arguments: a0=" << std::hex << a0 << " a3=" << a3 << endl;
+                Verilated::gotFinish(true);
+                return;
+            }
             System::sys->ecall_brk = (System::sys->ecall_brk + PAGE_SIZE-1) & ~(PAGE_SIZE-1); // align to 4K boundary
             *a0ret = System::sys->ecall_brk;
             for(long long addr = System::sys->ecall_brk; addr < System::sys->ecall_brk+a1; addr += PAGE_SIZE) System::sys->virt_to_phy(addr); // prefault
@@ -387,7 +391,7 @@ extern "C" {
                 long long physptr = System::sys->virt_to_phy((m.first & ~63) + i);
                 auto pw = pending_writes.find(physptr);
                 if (pw == pending_writes.end()) continue;
-                if (DEBUG_WRITES) cerr << "Merging in pending write for address 0x" << std::hex << pw->first << " value 0x" << (int)(pw->second) << std::endl;
+                if (DEBUG_WRITES) cerr << "Merging in pending write for address 0x" << std::hex << pw->first << " value 0x" << (int)(pw->second) << endl;
                 System::sys->ram[pw->first] = pw->second;
                 pending_writes.erase(pw);
             }
