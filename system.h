@@ -77,7 +77,7 @@ public:
     void set_errno(const int new_errno);
     void invalidate(const uint64_t phys_addr);
     uint64_t virt_to_phy(const uint64_t virt_addr);
-    void read_response(uint64_t addr, int tag, bool last);
+    void read_response(uint64_t addr, uint64_t value, int tag, bool last);
 
     char* ram;
     uint64_t ramsize;

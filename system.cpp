@@ -222,8 +222,8 @@ void System::tick(int clk) {
     }
 }
 
-void System::read_response(uint64_t addr, int tag, bool last) {
-    r_queue.push_back(make_pair(addr, make_pair(tag, last)));
+void System::read_response(uint64_t addr, uint64_t value, int tag, bool last) {
+    r_queue.push_back(make_pair(value, make_pair(tag, last)));
 }
 
 void System::dram_read_complete(unsigned id, uint64_t address, uint64_t clock_cycle) {
@@ -231,7 +231,7 @@ void System::dram_read_complete(unsigned id, uint64_t address, uint64_t clock_cy
     assert(tag != addr_to_tag.end());
     uint64_t orig_addr = tag->second.first;
     for(int i = 0; i < 64; i += 8)
-        read_response(*((uint64_t*)(&ram[((orig_addr&(~63))+((orig_addr+i)&63)) - dram_offset])), tag->second.second, i+8>=64);
+        read_response(address, *((uint64_t*)(&ram[((orig_addr&(~63))+((orig_addr+i)&63)) - dram_offset])), tag->second.second, i+8>=64);
     addr_to_tag.erase(tag);
 }
 

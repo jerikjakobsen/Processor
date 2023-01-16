@@ -21,7 +21,7 @@ void write_one(const Device* self, Vtop* top) {
 
 void clint_read(const Device* self, Vtop* top) {
     //cerr << "Read request of CLINT address (" << std::hex << System::sys->w_addr << ") unsupported, but will return 0 and keep going" << endl;
-    System::sys->read_response(0, top->m_axi_arid, true);
+    System::sys->read_response(0, 0, top->m_axi_arid, true);
 }
 
 void clint_write_data(const Device* self, Vtop* top) {
@@ -35,7 +35,7 @@ void uart_lite_read(const Device* self, Vtop* top) {
     int offset = (top->m_axi_araddr - self->start)/4;
     switch(offset) {
         case UART_LITE_STAT_REG:
-            System::sys->read_response(0, top->m_axi_arid, true);
+            System::sys->read_response(top->m_axi_araddr, 0, top->m_axi_arid, true);
             break;
         default:
             cerr << "Read request of uart_lite address (" << std::hex << top->m_axi_araddr << "/" << offset << ") unsupported" << endl;
