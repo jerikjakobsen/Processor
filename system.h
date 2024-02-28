@@ -41,15 +41,15 @@ class System {
 
     uint64_t load_binary(const char* filename);
 
-    list<pair<uint64_t, pair<int, bool> > > r_queue;
-    list<int> resp_queue;
-    set<uint64_t> snoop_queue;
+    std::list<std::pair<uint64_t, std::pair<int, bool> > > r_queue;
+    std::list<int> resp_queue;
+    std::set<uint64_t> snoop_queue;
     std::map<uint64_t, std::pair<uint64_t, int> > addr_to_tag;
 
     void dram_read_complete(unsigned id, uint64_t address, uint64_t clock_cycle);
     void dram_write_complete(unsigned id, uint64_t address, uint64_t clock_cycle);
 
-    bitset<GIGA/PAGE_SIZE> phys_page_used;
+    std::bitset<GIGA/PAGE_SIZE> phys_page_used;
     uint64_t get_phys_page();
     uint64_t get_pte(uint64_t base_addr, int vpn, bool isleaf, bool& allocated);
     uint64_t load_elf_parts(int fileDescriptor, size_t size, const uint64_t virt_addr);
