@@ -89,11 +89,13 @@ extern "C" {
                     a1 = System::sys->virt_to_phy(a1);
                     if (*(uint32_t*)&System::sys->ram[a1] == a2) *(uint32_t*)&System::sys->ram[a1] = a3;
                     *a0ret = a2;
+                    System::sys->invalidate(a1 & ~0x63);
                     return;
                 case 2/*RISCV_ATOMIC_CMPXCHG64*/:
                     a1 = System::sys->virt_to_phy(a1);
                     if (*(uint64_t*)&System::sys->ram[a1] == a2) *(uint64_t*)&System::sys->ram[a1] = a3;
                     *a0ret = a2;
+                    System::sys->invalidate(a1 & ~0x63);
                     return;
                 default:
                     cerr << "Unsupported arch-specific syscall " << a0 << endl;
