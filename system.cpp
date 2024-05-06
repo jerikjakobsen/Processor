@@ -148,7 +148,7 @@ void System::tick(int clk) {
                 cerr << "Read request with length != 8 (" << std::dec << top->m_axi_arlen << "+1)" << endl;
                 Verilated::gotFinish(true);
             } else if (addr_to_tag.find(r_addr)!=addr_to_tag.end()) {
-                cerr << "Access for " << std::hex << r_addr << " already outstanding.  Ignoring..." << endl;
+                cerr << "Access for " << std::hex << r_addr << " already outstanding.  Ignoring read..." << endl;
             } else {
                 assert(willAcceptTransaction(r_addr)); // if this gets triggered, need to rethink AXI "ready" signal strategy
                 assert(
@@ -186,7 +186,7 @@ void System::tick(int clk) {
                 cerr << "Write request with length != 8 (" << std::dec << top->m_axi_awlen << "+1)" << endl;
                 Verilated::gotFinish(true);
             } else if (addr_to_tag.find(w_addr)!=addr_to_tag.end()) {
-                cerr << "Access for " << std::hex << w_addr << " already outstanding.  Ignoring..." << endl;
+                cerr << "Access for " << std::hex << w_addr << " already outstanding.  Ignoring write..." << endl;
             } else {
                 assert(willAcceptTransaction(w_addr)); // if this gets triggered, need to rethink AXI "ready" signal strategy
                 assert(
