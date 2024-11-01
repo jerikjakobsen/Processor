@@ -1,4 +1,10 @@
 `include "Sysbus.defs"
+`include "pipeline_fetch.sv"
+`include "pipeline_decode.sv"
+`include "pipeline_ex.sv"
+`include "pipeline_wb.sv"
+`include "pipeline_memory.sv"
+// `include "register_file.sv"
 
 module top
 #(
@@ -60,14 +66,51 @@ module top
 );
 
   logic [63:0] pc;
+  logic [7:0] if_id_ctr;
+  logic [7:0] id_ex_ctr;
+  logic [7:0] ex_mem_ctr;
+  logic [7:0] mem_wb_ctr;
 
-  always_ff @ (posedge clk)
+  pipeline_fetch if_stage(
+    clk,
+    reset,
+    if_id_ctr
+  );
+
+  pipeline_decode id_stage(
+    clk,
+    reset,
+    if_id_ctr,
+    id_ex_ctr
+  );
+
+  pipeline_ex ex_stage(
+    clk,
+    reset,
+    id_ex_ctr,
+    ex_mem_ctr
+  );
+
+  pipeline_memory mem_stage(
+    clk,
+    reset,
+    ex_mem_ctr,
+    mem_wb_ctr
+  );
+
+  pipeline_wb wb_stage(
+    clk,
+    reset,
+    mem_wb_ctr
+  );
+
+
+  always_ff @ (posedge clk) begin
     if (reset) begin
       pc <= entry;
     end else begin
-      $display("Hello World!  @ %x", pc);
-      $finish;
     end
+  end
 
   initial begin
     $display("Initializing top, entry point = 0x%x", entry);
