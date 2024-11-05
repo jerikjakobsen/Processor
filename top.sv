@@ -65,50 +65,69 @@ module top
   input   wire [3:0]             m_axi_acsnoop
 );
 
-  logic [63:0] pc;
-  logic [7:0] if_id_ctr;
-  logic [7:0] id_ex_ctr;
-  logic [7:0] ex_mem_ctr;
-  logic [7:0] mem_wb_ctr;
+  logic [ADDR_WIDTH-1:0] write_back_pc;
+  logic pc_jumped;
+
+  logic if_data_valid;
+  logic [ADDR_WIDTH-1:0] if_instruction_pc;
+  logic [(DATA_WIDTH/2)-1:0] if_instruction;
 
   pipeline_fetch if_stage(
-    clk,
-    reset,
-    if_id_ctr
+    .clk(clk),
+    .reset(reset),
+    
+    .updated_pc(write_back_pc),
+    .reset_pc(pc_jumped),
+    .if_data_valid(if_data_valid),
+    .if_instruction_pc(if_instruction_pc),
+    .if_instruction(if_instruction),
+
+    .m_axi_arready(m_axi_arready),
+    .m_axi_araddr(m_axi_araddr),
+    .m_axi_arvalid(m_axi_arvalid),
+    .m_axi_rdata(m_axi_rdata),
+    .m_axi_rlast(m_axi_rlast),
+    .m_axi_rvalid(m_axi_rvalid),
+    .m_axi_rready(m_axi_rready)
   );
 
   pipeline_decode id_stage(
-    clk,
-    reset,
-    if_id_ctr,
-    id_ex_ctr
+    .clk(clk),
+    .reset(reset),
+
+    .if_data_valid(if_data_valid),
+    .instruction(if_instruction),
+    .pc(if_instruction_pc),
+    
+    .opcode(id_opcode),
+    .rf_reg1(rf_reg1),
+    .rf_reg2(rf_reg2),
+    .write_back_register(write_back_register),
+    .imm(imm),
+    .imm_or_reg2(imm_or_reg2)
   );
 
   pipeline_ex ex_stage(
-    clk,
-    reset,
-    id_ex_ctr,
-    ex_mem_ctr
+    .clk(clk),
+    .reset(reset),
+    .write_back_pc(write_back_pc),
+    .pc_jumped(pc_jumped)
   );
 
   pipeline_memory mem_stage(
-    clk,
-    reset,
-    ex_mem_ctr,
-    mem_wb_ctr
+    .clk(clk),
+    .reset(reset)
   );
 
   pipeline_wb wb_stage(
-    clk,
-    reset,
-    mem_wb_ctr
+    .clk(clk),
+    .reset(reset)
   );
 
 
   always_ff @ (posedge clk) begin
     if (reset) begin
-      pc <= entry;
-    end else begin
+      write_back_pc <= entry;
     end
   end
 
