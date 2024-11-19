@@ -6,6 +6,7 @@
 #define _Vtop___024unit_H_
 
 #include "verilated_heavy.h"
+#include "Vtop__Inlines.h"
 #include "Vtop__Dpi.h"
 
 class Vtop__Syms;
