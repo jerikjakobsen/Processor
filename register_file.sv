@@ -31,8 +31,8 @@ module register_file
 
 	always_comb begin
 		write_ready = 1;
-		val1 = registers[reg1];
-		val2 = registers[reg2];
+		val1 = write_enable && write_register == reg1 ? write_value : registers[reg1];
+		val2 = write_enable && write_register == reg2 ? write_value : registers[reg2];
 	end
 
 endmodule
