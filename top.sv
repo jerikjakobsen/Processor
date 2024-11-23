@@ -77,9 +77,10 @@ module top
   // ID -> EX
   logic [ADDR_WIDTH-1:0] ex_instr_pc, next_ex_instr_pc;
   logic [6:0] ex_opcode, next_ex_opcode;
+  logic [3:0] branch_type, next_branch_type;
   logic [DATA_WIDTH-1:0] r1_val, next_r1_val;
   logic [DATA_WIDTH-1:0] r2_val, next_r2_val;
-  logic signed [19:0] imm, next_imm;
+  logic signed [DATA_WIDTH-1:0] imm, next_imm;
   logic is_word_op, next_is_word_op;
   logic [4:0] ex_dst_reg, next_ex_dst_reg;
   logic imm_or_reg2, next_imm_or_reg2;
@@ -182,6 +183,7 @@ module top
     .instruction_pc(id_instr_pc),
     .next_stage_pc(next_ex_instr_pc),
     .ex_opcode(next_ex_opcode),
+    .branch_type(next_branch_type),
     .r1_reg(rf_reg1),
     .r2_reg(rf_reg2),
     .imm(next_imm),
@@ -200,6 +202,7 @@ module top
     .jump_pc(jump_pc),
     .jump_signal(jump_signal),
     .opcode(ex_opcode),
+    .branch_type(branch_type),
     .instruction_pc(ex_instr_pc),
     .r1_val(r1_val),
     .r2_val(r2_val),
@@ -262,6 +265,7 @@ module top
       if(ex_ready) begin
         if(jump_signal) begin
           ex_opcode <= 0; // NOP
+          branch_type <= 0;
           ex_instr_pc <= 0;
           r1_val <= 0;
           r2_val <= 0;
@@ -275,6 +279,7 @@ module top
           if(next_mem_opcode == 1 && (next_mem_dst_reg == rf_reg1 || next_mem_dst_reg == rf_reg2)) begin
             // Ex has an instruction that loads a reg1 or reg2 from memory
             ex_opcode <= 0;
+            branch_type <= 0;
             ex_instr_pc <= 0;
             r1_val <= 0;
             r2_val <= 0;
@@ -287,6 +292,7 @@ module top
           end else if (!mem_ready && mem_opcode == 1 && (mem_dst_reg == rf_reg1 || mem_dst_reg == rf_reg2)) begin
             // Mem is loading an instruction into reg1 or reg2
             ex_opcode <= 0;
+            branch_type <= 0;
             ex_instr_pc <= 0;
             r1_val <= 0;
             r2_val <= 0;
@@ -298,6 +304,7 @@ module top
             is_mem_load_ex <= 0;
           end else begin
             ex_opcode <= next_ex_opcode;
+            branch_type <= next_branch_type;
             ex_instr_pc <= next_ex_instr_pc;
             imm <= next_imm;
             ex_dst_reg <= next_ex_dst_reg;

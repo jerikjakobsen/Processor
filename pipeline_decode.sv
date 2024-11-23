@@ -11,11 +11,12 @@ module pipeline_decode
     input wire [(DATA_WIDTH/2)-1:0] instruction,
     input wire [ADDR_WIDTH-1:0] instruction_pc,
     output wire [ADDR_WIDTH-1:0] next_stage_pc,
-    output wire [63:0] ex_opcode,
+    output wire [6:0] ex_opcode,
+    output wire [3:0] branch_type,
     output wire [4:0] r1_reg,
     output wire [4:0] r2_reg,
     output wire [4:0] dst_reg,
-    output wire signed [20:0] imm,
+    output wire signed [DATA_WIDTH-1:0] imm,
     output wire is_word_op,
     output wire imm_or_reg2,
     output wire mem_opcode,
@@ -36,7 +37,18 @@ module pipeline_decode
             REM = 4'd8,
             SL = 4'd9,
             SR = 4'd10,
-            JUMP = 4'd11;
+            JUMP = 4'd11,
+            LOAD_MEM = 4'd12,
+            STORE_MEM = 4'd13;
+  
+  parameter BEQ  = 3'b000,
+            BNE  = 3'b001,
+            BLT  = 3'b010,
+            BGE  = 3'b011,
+            BLTU = 3'b100,
+            BGEU = 3'b101,
+            JAL = 3'b110,
+            JALR = 3'b111;
 
   logic [6:0] opcode;
   logic [2:0] funct3;
@@ -160,22 +172,75 @@ module pipeline_decode
           case(funct3)
             3'b000: begin
               // JALR
-              ex_opcode = JUMP; // TODO
-              r1_reg = instruction[19:15];
+              ex_opcode = JUMP;
+              branch_type = JALR;
               dst_reg = instruction[11:7];
               imm_or_reg2 = IMM;
               imm = {{52{instruction[31]}}, instruction[31:20]};
+              r1_reg = instruction[19:15];
             end
 
             default: begin
               // JAL
-              ex_opcode = JUMP; // TODO
+              ex_opcode = JUMP;
+              branch_type = JAL;
               dst_reg = instruction[11:7];
               imm_or_reg2 = IMM;
-              // Build IMM
-              // Set valid_r1 to false
+              imm[20] = instruction[31];
+              imm[10:1] = instruction[30:21];
+              imm[11] = instruction[20];
+              imm[19:12] = instruction[19:12];
+              imm[0] = 1'b0;
+              imm[63:21] = {43{instruction[31]}};
             end
           endcase
+        end
+
+        7'b1100011: begin
+          ex_opcode = JUMP;
+          // Conditional Branches
+          funct3 = instruction[14:12];
+
+          imm[12]   = instruction[31];
+          imm[10:5] = instruction[30:25];
+          imm[4:1]  = instruction[11:8];
+          imm[11]   = instruction[7];
+          imm[0]    = 1'b0;
+
+          imm[63:13] = {52{instruction[31]}};
+
+          dst_reg = 0;
+          r1_reg = instruction[19:15];
+          r2_reg = instruction[24:20];
+
+          case(funct3)
+            3'b000: begin
+              branch_type = BEQ;
+            end
+            3'b001: begin
+              branch_type = BNE;
+            end
+            3'b100: begin
+              branch_type = BLT;
+            end
+            3'b101: begin
+              branch_type = BGE;
+            end
+            3'b110: begin
+              branch_type = BLTU;
+            end
+            3'b111: begin
+              branch_type = BGEU;
+            end
+          endcase
+        end
+
+        7'b0000011: begin
+          ex_opcode = LOAD_MEM;
+        end
+
+        7'b0100011: begin
+          ex_opcode = STORE_MEM;
         end
 
         default: begin
@@ -186,8 +251,6 @@ module pipeline_decode
         end
       endcase
     end
-
-
   end
 
 endmodule
@@ -196,8 +259,6 @@ endmodule
 
 // Load
 // Store
-// Jump
-// Branch
 
 
 
@@ -219,12 +280,15 @@ endmodule
   // 3c:	00008067          	ret
 
 
+// LB
+// LH
+// LW
+// LBU
+// LHU
+// LWU
+// LD
 
-// BEQ
-// BNE
-// BLT
-// BGE
-// BLTU
-// BGEU
-// JALR
-// JAL
+// SB
+// SH
+// SW
+// SD

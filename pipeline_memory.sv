@@ -18,17 +18,8 @@ module pipeline_memory
 
     output wire [ADDR_WIDTH-1:0] S_R_ADDR,
     output wire S_R_ADDR_VALID,
-    input wire S_R_ADDR_READY,
-
-    input wire [DATA_WIDTH-1:0] S_R_DATA,
-    input wire S_R_DATA_VALID,
-    output wire S_R_DATA_READY,
-    
-    input wire S_W_READY,
-    input wire S_W_DONE,
-    output wire S_W_VALID,
-    output wire [ADDR_WIDTH-1:0] S_W_ADDR,
-    output wire [DATA_WIDTH-1:0] S_W_DATA
+    input wire [BUFFER_SIZE-1:0] S_R_DATA,
+    input wire S_R_DATA_VALID
 );
   parameter IDLE = 3'd0,
             R_REQUEST = 3'd1,

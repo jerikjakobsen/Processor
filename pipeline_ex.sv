@@ -16,7 +16,7 @@ module pipeline_ex
     input wire [ADDR_WIDTH-1:0] instruction_pc,
     input wire [DATA_WIDTH-1:0] r1_val,
     input wire [DATA_WIDTH-1:0] r2_val,
-    input wire signed [20:0] imm,
+    input wire signed [DATA_WIDTH-1:0] imm,
     input wire [4:0] dst_reg,
     input wire imm_or_reg2,
     input wire [31:0] mem_opcode,
@@ -39,7 +39,17 @@ module pipeline_ex
             DIV = 4'd7,
             REM = 4'd8,
             SL = 4'd9,
-            SR = 4'd10;
+            SR = 4'd10,
+            JUMP = 4'd11;
+  
+  parameter BEQ  = 3'b000,
+            BNE  = 3'b001,
+            BLT  = 3'b010,
+            BGE  = 3'b011,
+            BLTU = 3'b100,
+            BGEU = 3'b101,
+            JAL = 3'b110,
+            JALR = 3'b111;
   
   logic [63:0] operand2;
   assign operand2 = (imm_or_reg2) ? imm : r2_val;
@@ -106,6 +116,66 @@ module pipeline_ex
       
       SR: begin
         ex_res = r1_val >> operand2[5:0]; // Shift by lower 6 bits for 64-bit values
+      end
+
+      JUMP: begin
+        case(branch_type):
+          JAL: begin
+            jump_signal = 1;
+            jump_pc = operand2;
+          end
+
+          JALR: begin
+            jump_signal = 1;
+            jump_pc = r1_val + operand2;
+          end
+
+          BEQ: begin
+            if (r1_val == r2_val) begin
+              jump_signal = 1;
+              jump_pc = imm;
+            end
+          end
+          
+          BNE: begin
+            if (r1_val != r2_val) begin
+              jump_signal = 1;
+              jump_pc = imm;
+            end
+          end
+          
+          BLT: begin
+            if ($signed(r1_val) < $signed(r2_val)) begin
+              jump_signal = 1;
+              jump_pc = imm;
+            end
+          end
+          
+          BGE: begin
+            if ($signed(r1_val) >= $signed(r2_val)) begin
+              jump_signal = 1;
+              jump_pc = imm;
+            end
+          end
+          
+          BLTU: begin
+            if (r1_val < r2_val) begin
+              jump_signal = 1;
+              jump_pc = imm;
+            end
+          end
+          
+          BGEU: begin
+            if (r1_val >= r2_val) begin
+              jump_signal = 1;
+              jump_pc = imm;
+            end
+          end
+
+          default: begin
+            jump_signal = 0;
+          end
+        endcase
       end
 
       default: begin
