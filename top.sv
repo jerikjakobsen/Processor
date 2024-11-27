@@ -1,9 +1,10 @@
 `include "Sysbus.defs"
-`include "pipeline_fetch.sv"
-`include "pipeline_decode.sv"
-`include "pipeline_ex.sv"
-`include "pipeline_wb.sv"
-`include "pipeline_memory.sv"
+// `include "pipeline_fetch.sv"
+// `include "pipeline_decode.sv"
+// `include "pipeline_ex.sv"
+// `include "pipeline_wb.sv"
+// `include "pipeline_memory.sv"
+`include "llc2.sv"
 // `include "register_file.sv"
 
 module top
@@ -65,51 +66,233 @@ module top
   input   wire [3:0]             m_axi_acsnoop
 );
 
-  logic [63:0] pc;
-  logic [7:0] if_id_ctr;
-  logic [7:0] id_ex_ctr;
-  logic [7:0] ex_mem_ctr;
-  logic [7:0] mem_wb_ctr;
+  logic [63:0] pc, next_pc;
+  logic [511:0] read_content, next_read_content;
+  logic [2:0] state, next_state;
 
-  pipeline_fetch if_stage(
-    clk,
-    reset,
-    if_id_ctr
+  logic [63:0] S1_R_ADDR;
+  logic S1_R_ADDR_VALID;
+  logic [511:0] S1_R_DATA;
+  logic S1_R_DATA_VALID;
+
+  logic [63:0] S2_R_ADDR;
+  logic S2_R_ADDR_VALID;
+  logic [511:0] S2_R_DATA;
+  logic S2_R_DATA_VALID;
+
+  logic S_W_VALID;
+  logic [63:0] S_W_ADDR;
+  logic [511:0] S_W_DATA;
+  logic S_W_READY;
+  logic S_W_COMPLETE;
+  logic data_switch, next_data_switch;
+  
+  parameter R_IDLE = 0,
+            R_REQUEST = 1;
+  
+  parameter IDLE = 0,
+            W_REQUEST = 1,
+            W_WAIT = 2,
+            R2_REQUEST = 3;
+  logic [2:0] request_alternator, next_request_alternator;
+
+  logic [2:0] l1_I_state, next_l1_I_state;
+  logic [63:0] l1_I_addr, next_l1_I_addr;
+
+  logic [2:0] l1_D_state, next_l1_D_state;
+  logic [63:0] l1_D_addr, next_l1_D_addr;
+  logic [511:0] l1_D_data, next_l1_D_data;
+
+  llc axi_cache_interface(
+    .clk(clk),
+    .reset(reset),
+    .S1_R_ADDR(S1_R_ADDR),
+    .S1_R_ADDR_VALID(S1_R_ADDR_VALID),
+    .S1_R_DATA(S1_R_DATA),
+    .S1_R_DATA_VALID(S1_R_DATA_VALID),
+
+    .S2_R_ADDR(S2_R_ADDR),
+    .S2_R_ADDR_VALID(S2_R_ADDR_VALID),
+    .S2_R_DATA(S2_R_DATA),
+    .S2_R_DATA_VALID(S2_R_DATA_VALID),
+
+    .S_W_VALID(S_W_VALID),
+    .S_W_ADDR(S_W_ADDR),
+    .S_W_DATA(S_W_DATA),
+    .S_W_READY(S_W_READY),
+    .S_W_COMPLETE(S_W_COMPLETE),
+    .m_axi_arready(m_axi_arready),
+    .m_axi_araddr(m_axi_araddr),
+    .m_axi_arvalid(m_axi_arvalid),
+    .m_axi_rdata(m_axi_rdata),
+    .m_axi_rlast(m_axi_rlast),
+    .m_axi_rvalid(m_axi_rvalid),
+    .m_axi_rready(m_axi_rready),
+    .m_axi_awvalid(m_axi_awvalid),
+    .m_axi_awready(m_axi_awready),
+    .m_axi_awaddr(m_axi_awaddr),
+    .m_axi_wdata(m_axi_wdata),
+    .m_axi_wlast(m_axi_wlast),
+    .m_axi_wvalid(m_axi_wvalid),
+    .m_axi_wready(m_axi_wready),
+    .m_axi_bvalid(m_axi_bvalid),
+    .m_axi_bready(m_axi_bready)
   );
-
-  pipeline_decode id_stage(
-    clk,
-    reset,
-    if_id_ctr,
-    id_ex_ctr
-  );
-
-  pipeline_ex ex_stage(
-    clk,
-    reset,
-    id_ex_ctr,
-    ex_mem_ctr
-  );
-
-  pipeline_memory mem_stage(
-    clk,
-    reset,
-    ex_mem_ctr,
-    mem_wb_ctr
-  );
-
-  pipeline_wb wb_stage(
-    clk,
-    reset,
-    mem_wb_ctr
-  );
-
 
   always_ff @ (posedge clk) begin
     if (reset) begin
+      state <= IDLE;
       pc <= entry;
+      data_switch <= 1;
+      l1_I_state <= R_IDLE;
+      l1_I_addr <= 0;
+      l1_D_state <= IDLE;
+      l1_D_addr <= 64'h0000000000004440;
+      l1_D_data <= 512'h4440;
+      request_alternator <= 0;
     end else begin
+      state <= next_state;
+      pc <= next_pc;
+      read_content <= next_read_content;
+      data_switch <= next_data_switch;
+      request_alternator <= next_request_alternator;
+      l1_I_state <= next_l1_I_state;
+      l1_I_addr <= next_l1_I_addr;
+      l1_D_state <= next_l1_D_state;
+      l1_D_addr <= next_l1_D_addr;
+      l1_D_data <= next_l1_D_data;
     end
+
+    if (pc == 80) begin
+      $finish;
+    end
+  end
+
+  // State output logic
+  always_comb begin
+    m_axi_arburst = 2'b10;
+    m_axi_awburst = 2'b01;
+    m_axi_arsize = 3'b011;
+    m_axi_awsize = 3'b011;
+    m_axi_arlen =  8'd7;
+    m_axi_awlen =  8'd7;
+    // case (state)
+    //   IDLE: begin
+    //     S1_R_ADDR = 0;
+    //     S1_R_ADDR_VALID = 0;
+    //     S_W_VALID = 0;
+    //   end
+    //   REQUEST: begin
+    //     S1_R_ADDR_VALID = 1;
+    //     S1_R_ADDR = data_switch ? 64'h0000000000004440 : 64'h0000000000002104;
+    //     S_W_ADDR =  data_switch ? 64'h0000000000004440 : 64'h0000000000002104;
+    //     S_W_DATA = data_switch ? 64'hdeadbeefdeadbeef : 64'hfeedfeedfeedfeed;
+    //     S_W_VALID = 1;
+    //     S1_R_ADDR_VALID = 0;
+    //     S_W_VALID = 0;
+    //   end
+    //   // WRITE_REQUEST: begin
+        
+    //   // end
+    // endcase 
+  end
+
+  // State transition logic
+  // always_comb begin
+  //   case (state)
+  //     IDLE: begin
+  //       next_pc = pc;
+  //       next_state = REQUEST;
+  //     end
+  //     REQUEST: begin
+  //       if (S_W_COMPLETE && S1_R_DATA_VALID) begin
+  //         next_state = IDLE;
+  //         next_data_switch = !data_switch;
+  //       end else if (S1_R_DATA_VALID) next_state = WRITE_REQUEST;
+  //       if (S1_R_DATA_VALID) begin
+  //         next_read_content = S1_R_DATA;
+  //         next_pc = pc + 4;
+  //       end else begin
+  //         next_pc = pc;
+  //       end
+  //     end
+  //     WRITE_REQUEST: begin
+  //       next_state = S_W_COMPLETE ? IDLE : WRITE_REQUEST;
+  //       next_data_switch = S_W_COMPLETE ? !data_switch : data_switch;
+  //     end
+  //     WRITE_DONE: begin
+  //       next_state = S_W_COMPLETE ? IDLE : WRITE_DONE;
+  //     end
+  //   endcase 
+  // end
+
+  // L1-I
+
+  always_comb begin // State transition
+    case (l1_I_state)
+      R_IDLE: begin
+        if (S1_R_DATA_VALID) begin
+          next_l1_I_addr = l1_I_addr + 64;
+        end
+      end
+      // R_REQUEST: begin
+
+      // end
+    endcase
+  end
+
+  always_comb begin // Output Variables
+    case (l1_I_state)
+      R_IDLE: begin
+        S1_R_ADDR = l1_I_addr;
+        S1_R_ADDR_VALID = 1;
+      end
+      // R_REQUEST: begin
+
+      // end
+    endcase
+  end
+
+  // L1-D
+
+  always_comb begin // State Transition
+    case (l1_D_state)
+      IDLE: begin
+        next_request_alternator = request_alternator + 1;
+        next_l1_D_state = request_alternator == 0 ? W_REQUEST : R2_REQUEST;
+        next_l1_D_addr = l1_D_addr + 32;
+        next_l1_D_data = l1_D_addr + 32;
+      end
+      W_REQUEST: begin
+        next_l1_D_state = S_W_READY ? W_WAIT : W_REQUEST;
+      end
+      W_WAIT: begin
+        next_l1_D_state = S_W_COMPLETE ? IDLE : W_WAIT;
+      end
+      R2_REQUEST: begin
+        next_l1_D_state = S2_R_DATA_VALID ? IDLE : R2_REQUEST;
+      end
+    endcase
+  end
+
+  always_comb begin // Output Variables
+    case (l1_D_state)
+      IDLE: begin
+        S_W_VALID = 0;
+        S2_R_ADDR_VALID = 0;
+      end
+      W_REQUEST: begin
+        S_W_ADDR = l1_D_addr;
+        S_W_VALID = 1;
+      end
+      // W_WAIT: begin
+
+      // end
+      R2_REQUEST: begin
+        S2_R_ADDR_VALID = 1;
+        S2_R_ADDR = l1_D_addr;
+      end
+    endcase
   end
 
   initial begin
