@@ -12,7 +12,8 @@ module pipeline_ex
     output wire jump_signal,
     output wire [ADDR_WIDTH-1:0] jump_pc,
     
-    input wire [31:0] opcode,
+    input wire [6:0] opcode,
+    input wire [3:0] branch_type,
     input wire [ADDR_WIDTH-1:0] instruction_pc,
     input wire [DATA_WIDTH-1:0] r1_val,
     input wire [DATA_WIDTH-1:0] r2_val,
@@ -20,13 +21,15 @@ module pipeline_ex
     input wire [4:0] dst_reg,
     input wire imm_or_reg2,
     input wire [31:0] mem_opcode,
-    input wire is_mem_load,
+    input wire [3:0] mem_operation_size,
     input wire is_word_op,
     output wire [DATA_WIDTH-1:0] ex_res,
     output wire [DATA_WIDTH-1:0] r2_val_mem,
     output wire [4:0] mem_dst_reg,
     output wire [31:0] next_mem_opcode,
-    output wire next_is_mem_load
+    output wire [2:0] next_mem_operation_size,
+    input wire ecall,
+    output wire ecall_mem
 );
 
   parameter NOP = 4'd0,
@@ -40,7 +43,9 @@ module pipeline_ex
             REM = 4'd8,
             SL = 4'd9,
             SR = 4'd10,
-            JUMP = 4'd11;
+            JUMP = 4'd11,
+            PC_ADD = 4'd12,
+            LOAD_REGISTER = 4'd13;
   
   parameter BEQ  = 3'b000,
             BNE  = 3'b001,
@@ -57,12 +62,14 @@ module pipeline_ex
   always_comb begin
     ready = (opcode == 0 || next_stage_ready);
     next_mem_opcode = mem_opcode;
-    next_is_mem_load = is_mem_load;
+    next_mem_operation_size = mem_operation_size;
     mem_dst_reg = dst_reg;
     r2_val_mem = r2_val;
+    ecall_mem = ecall;
     
     case(opcode)
       ADD: begin
+        jump_signal = 0;
         if(is_word_op) begin
           ex_res[31:0] = r1_val[31:0] + operand2[31:0];
           ex_res = {{32{ex_res[31]}}, ex_res[31:0]};
@@ -72,6 +79,7 @@ module pipeline_ex
       end
       
       SUB: begin
+        jump_signal = 0;
         if(is_word_op) begin
           ex_res[31:0] = r1_val[31:0] - operand2[31:0];
           ex_res = {{32{ex_res[31]}}, ex_res[31:0]};
@@ -81,6 +89,7 @@ module pipeline_ex
       end
       
       AND: begin
+        jump_signal = 0;
         if(is_word_op) begin
           ex_res[31:0] = r1_val[31:0] & operand2[31:0];
           ex_res = {{32{ex_res[31]}}, ex_res[31:0]};
@@ -90,10 +99,12 @@ module pipeline_ex
       end
 
       XOR: begin
+        jump_signal = 0;
         ex_res = r1_val ^ operand2;
       end
       
       MUL: begin
+        jump_signal = 0;
         if(is_word_op) begin
           ex_res[31:0] = r1_val[31:0] * operand2[31:0];
           ex_res = {{32{ex_res[31]}}, ex_res[31:0]};
@@ -103,31 +114,47 @@ module pipeline_ex
       end
       
       DIV: begin
+        jump_signal = 0;
         ex_res = r1_val / operand2;
       end
       
       REM: begin
+        jump_signal = 0;
         ex_res = r1_val % operand2;
       end
       
       SL: begin
+        jump_signal = 0;
         ex_res = r1_val << operand2[5:0]; // Shift by lower 6 bits for 64-bit values
       end
       
       SR: begin
+        jump_signal = 0;
         ex_res = r1_val >> operand2[5:0]; // Shift by lower 6 bits for 64-bit values
       end
 
+      LOAD_REGISTER: begin
+        jump_signal = 0;
+        ex_res = (imm << 12);
+      end
+
+      PC_ADD: begin
+        jump_signal = 0;
+        ex_res = instruction_pc + (imm << 12);
+      end
+
       JUMP: begin
-        case(branch_type):
+        case(branch_type)
           JAL: begin
             jump_signal = 1;
-            jump_pc = operand2;
+            jump_pc = instruction_pc + operand2;
+            ex_res = instruction_pc + 4;
           end
 
           JALR: begin
             jump_signal = 1;
             jump_pc = r1_val + operand2;
+            ex_res = instruction_pc + 4;
           end
 
           BEQ: begin
@@ -179,18 +206,10 @@ module pipeline_ex
       end
 
       default: begin
+        jump_signal = 0;
         ex_res = 64'd0;
       end
     endcase
-
-
-
-    if(instruction_pc == 66508) begin
-      jump_signal = 1;
-      jump_pc = 66392;
-    end else begin
-      jump_signal = 0;
-    end
   end
 
 endmodule

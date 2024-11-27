@@ -33,8 +33,8 @@ module L1_I #(
     logic [2:0] state, next_state;
     logic [63:0] latched_requested_address, next_latched_requested_address;
 
-    logic [63:0] next_L2_S_R_ADDR;
-    logic next_L2_S_R_ADDR_VALID;
+    // logic [63:0] next_L2_S_R_ADDR;
+    // logic next_L2_S_R_ADDR_VALID;
 
     typedef struct packed {
         logic [DATA_SIZE-1:0] data;       // Data section (e.g., 512 bits)
@@ -85,8 +85,10 @@ module L1_I #(
       cache <= next_cache;
       buffer_index <= next_buffer_index;
 
-      L2_S_R_ADDR <= next_L2_S_R_ADDR;
-      L2_S_R_ADDR_VALID <= next_L2_S_R_ADDR_VALID;
+      // if(next_L2_S_R_ADDR_VALID) begin
+      //   L2_S_R_ADDR <= next_L2_S_R_ADDR;
+      //   L2_S_R_ADDR_VALID <= next_L2_S_R_ADDR_VALID;
+      // end  
     end
   end
 
@@ -100,13 +102,13 @@ always_comb begin
         
         if (S_R_ADDR_VALID) begin
           next_latched_requested_address = S_R_ADDR;
-          next_state = selected_tag == requested_tag && selected_block_is_valid && S_R_ADDR_VALID ? IDLE : READ_REQUEST;
+          next_state = selected_tag == requested_tag && selected_block_is_valid ? IDLE : READ_REQUEST;
         end
       end
 
       READ_REQUEST: begin
-        next_L2_S_R_ADDR = S_R_ADDR;
-        next_L2_S_R_ADDR_VALID = 1;
+        L2_S_R_ADDR = S_R_ADDR;
+        L2_S_R_ADDR_VALID = 1;
         S_R_DATA_VALID = 0;
 
         next_cache[latched_requested_index].valid = 0;
@@ -119,8 +121,8 @@ always_comb begin
           next_cache[latched_requested_index].data = L2_S_R_DATA;
           next_cache[latched_requested_index].valid = 1;
           next_cache[latched_requested_index].tag = latched_requested_tag;
-          next_L2_S_R_ADDR = 0;
-          next_L2_S_R_ADDR_VALID = 0;
+          L2_S_R_ADDR = 0;
+          L2_S_R_ADDR_VALID = 0;
           next_state = IDLE;
         end else begin
           next_state = READ; 

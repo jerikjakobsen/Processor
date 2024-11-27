@@ -50,14 +50,14 @@ module pipeline_fetch
 
   always_comb begin
     if(!empty_buffer && pc >= buffer_start && pc < (buffer_start + 64)) begin
-      instruction = instruction_buffer[((pc - buffer_start) * 8)+:31];
+      instruction = instruction_buffer[((pc - buffer_start) * 8)+:32];
       next_stage_pc = pc;
       next_if_pc = pc + 4;
     end else begin
       instruction = 0;
       next_stage_pc = 0;
       next_if_pc = pc;
-      if(pc != 0 && state == IDLE) begin
+      if(state == IDLE) begin // pc != 0 && state == IDLE
         next_state = REQUEST;
       end
     end
@@ -68,12 +68,14 @@ module pipeline_fetch
       IDLE: begin
         next_S_R_ADDR = 0;
         next_S_R_ADDR_VALID = 0;
+        next_empty_buffer = empty_buffer;
       end
 
       REQUEST: begin
         next_S_R_ADDR = pc;
         next_S_R_ADDR_VALID = 1;
         next_state = READ;
+        next_empty_buffer = empty_buffer;
       end
 
       READ: begin

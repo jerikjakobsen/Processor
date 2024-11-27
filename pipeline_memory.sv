@@ -11,114 +11,132 @@ module pipeline_memory
     input wire [DATA_WIDTH-1:0] ex_res,
     input wire [DATA_WIDTH-1:0] r2_val,
     input wire [4:0] dst_reg,
-    input wire [31:0] opcode,
+    input wire [6:0] opcode,
+    input wire [3:0] mem_operation_size,
     output wire [4:0] wb_dst_reg,
     output wire [DATA_WIDTH-1:0] wb_dst_val,
     output wire wb_enable,
+    input wire ecall,
+    output wire ecall_wb,
 
     output wire [ADDR_WIDTH-1:0] S_R_ADDR,
     output wire S_R_ADDR_VALID,
-    input wire [BUFFER_SIZE-1:0] S_R_DATA,
-    input wire S_R_DATA_VALID
+    input wire [DATA_WIDTH-1:0] S_R_DATA,
+    input wire S_R_DATA_VALID,
+
+    output wire S_W_VALID,
+    output wire [ADDR_WIDTH-1:0] S_W_ADDR,
+    output wire [DATA_WIDTH-1:0] S_W_DATA,
+    input wire S_W_READY,
+    input wire S_W_COMPLETE
 );
   parameter IDLE = 3'd0,
-            R_REQUEST = 3'd1,
+            READ_REQUEST = 3'd1,
             READ = 3'd3,
-            W_REQUEST = 3'd4,
-            WRITE = 3'd5;
+            WRITE_REQUEST = 3'd4,
+            WRITE_WAIT = 3'd5;
 
-  logic [1:0] state, next_state;
+  logic [2:0] state, next_state;
+
+  logic next_S_R_ADDR_VALID;
+  logic [ADDR_WIDTH-1:0] next_S_R_ADDR;
+  logic next_S_W_VALID;
+  logic [ADDR_WIDTH-1:0] next_S_W_ADDR;
+  logic [DATA_WIDTH-1:0] next_S_W_DATA;
 
   always_ff  @ (posedge clk) begin
     if(reset) begin
       state <= IDLE;
+      S_R_ADDR_VALID <= 0;
+      S_W_VALID <= 0;
     end else begin
       state <= next_state;
+      S_R_ADDR_VALID <= next_S_R_ADDR_VALID;
+      S_R_ADDR <= next_S_R_ADDR;
+      S_W_VALID <= next_S_W_VALID;
+      S_W_ADDR <= next_S_W_ADDR;
+      S_W_DATA <= next_S_W_DATA;
     end
   end 
 
   always_comb begin
-    ready = 1; // (state == IDLE);
-    if(opcode == 0) begin
-      next_state = IDLE;
+    wb_dst_reg = dst_reg;
+    ecall_wb = ecall;
+
+    if(state == IDLE) begin
+      if(opcode == 0) begin
+        next_state = IDLE;
+        ready = 1;
+      end else if(opcode == 1) begin
+        next_state = READ_REQUEST;
+        ready = 0;
+      end else if (opcode == 2) begin
+        next_state = WRITE_REQUEST;
+        ready = 0;
+      end else begin
+        next_state = IDLE;
+        ready = 1;
+      end
     end
-    if(opcode == 1) begin
-      next_state = R_REQUEST;
-    end else if (opcode == 2) begin
-      next_state = W_REQUEST;
-    end else begin
-      next_state = IDLE;
-    end
+
+    // ready = state == IDLE && next_state != READ_REQUEST && next_state != WRITE_REQUEST; // (opcode != 1 && opcode != 2 && state == IDLE) || ((opcode == 1 || opcode == 2) && next_state == IDLE);
   end
 
   always_comb begin
     case(state)
       IDLE: begin
+        next_S_R_ADDR_VALID = 0;
+        next_S_W_VALID = 0;
+        if(opcode == 3) begin
+          wb_enable = 1;
+          wb_dst_val = ex_res;
+        end else begin
+          wb_enable = 0;
+        end
       end
 
-      R_REQUEST: begin
-      
+      READ_REQUEST: begin
+        // Read value at addr {ex_res} into wb_dst_val
+        next_S_R_ADDR = ex_res;
+        next_S_R_ADDR_VALID = 1;
+        next_state = READ;
+        wb_enable = 0;
       end
 
       READ: begin
-      
+        if(S_R_DATA_VALID) begin
+          wb_enable = 1;
+          wb_dst_val = S_R_DATA; // TODO: Handle based on operation size
+          next_S_R_ADDR_VALID = 0;
+          next_state = IDLE;
+          ready = 1;
+        end else begin
+          next_state = READ;
+        end
       end
 
-      W_REQUEST: begin
-
+      WRITE_REQUEST: begin
+        // Write r2_val into the addr {ex_res}
+        wb_enable = 0;
+        if(S_W_READY) begin
+          next_S_W_ADDR = ex_res;
+          next_S_W_DATA = r2_val; // TODO: Handle based on operation size
+          next_S_W_VALID = 1;
+          next_state = WRITE_WAIT;
+        end else begin
+          next_state = WRITE_REQUEST;
+        end
       end
 
-      WRITE: begin
-      
+      WRITE_WAIT: begin
+        if(S_W_COMPLETE) begin
+          next_S_W_VALID = 0;
+          next_state = IDLE;
+          ready = 1;
+        end else begin
+          next_state = WRITE_WAIT;
+        end
       end
     endcase    
   end
-
-
-
-
-
-
-
-
-
-
-
-  // parameter IDLE = 2'd0,
-  //           RW_OP = 2'd1;
-
-  // logic [1:0] state, next_state;
-  // logic [2:0] ctr, next_ctr;
-
-  // always_ff  @ (posedge clk) begin
-  //   if(reset) begin
-  //     state <= IDLE;
-  //     ctr <= 0;
-  //   end else begin
-  //     state <= next_state;
-  //     ctr <= next_ctr;
-  //   end
-  // end
-
-  // always_comb begin
-    
-
-  //   if(opcode >= 1) begin
-  //     next_state = RW_OP;
-  //   end
-  // end
-
-  // always_comb begin
-  //   case(state)
-  //     IDLE: begin
-  //       next_ctr = 0;
-  //     end
-
-  //     RW_OP: begin
-  //       next_ctr = ctr == 3 ? 0 : ctr + 1;
-  //       next_state = ctr == 3 ? IDLE : RW_OP;
-  //     end
-  //   endcase
-  // end
-
 endmodule

@@ -2,6 +2,7 @@ module register_file
 (
 	input wire clk,
 	input wire reset,
+	input wire [63:0] stackptr,
 	
 	input wire [4:0] reg1,
 	input wire [4:0] reg2,
@@ -11,7 +12,9 @@ module register_file
 	input wire write_enable,
 	input wire [63:0] write_value,
 	input wire [4:0] write_register,
-	output wire write_ready
+	output wire write_ready,
+	input wire ecall,
+	output wire ecall_done
 );
 
 	logic [63:0] registers [31:0];
@@ -22,10 +25,18 @@ module register_file
 			for (i = 0; i < 32; i = i + 1) begin
 				registers[i] <= 64'b0;
 			end
+			registers[2] <= stackptr;
 		end else begin
 			if(write_enable) begin
 				registers[write_register] <= write_value;	
 			end
+		end
+
+		if(ecall) begin
+			do_ecall(registers[17], registers[10], registers[11], registers[12], registers[13], registers[14], registers[15], registers[16], registers[10]);
+			ecall_done <= 1;
+		end else begin
+			ecall_done <= 0;
 		end
 	end
 

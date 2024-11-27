@@ -1,4 +1,4 @@
-module llc #( 
+module L1_D #( 
     parameter LINE_COUNT = 64, 
     parameter BYTES_PER_LINE = 64, 
     parameter INDEX_SIZE = $clog2(LINE_COUNT), 
@@ -15,7 +15,7 @@ module llc #(
     input wire [63:0] S_R_ADDR,
     input wire S_R_ADDR_VALID,
 
-    output wire [511:0] S_R_DATA,
+    output wire [63:0] S_R_DATA,
     output wire S_R_DATA_VALID,
 
     // Write
@@ -79,6 +79,12 @@ module llc #(
     logic [TAG_SIZE-1:0] r_requested_tag, r_selected_tag, latched_r_requested_tag, w_selected_tag, w_requested_tag, latched_w_requested_tag, latched_w_selected_tag;
     logic [INDEX_SIZE-1:0] r_requested_index, latched_r_requested_index, w_requested_index, latched_w_requested_index;
 
+    // logic [63:0] next_L2_S_R_ADDR;
+    // logic next_L2_S_R_ADDR_VALID;
+    logic next_L2_S_W_VALID;
+    logic [63:0] next_L2_S_W_ADDR;
+    logic [511:0] next_L2_S_W_DATA;
+
     always_comb begin // Convenience signals
       // Read Signals
       r_requested_tag = S_R_ADDR[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE]; // Combinatorial access to requested address for read
@@ -112,6 +118,7 @@ module llc #(
   always_ff @ (posedge clk) begin
     if (reset) begin
       state <= IDLE;
+      // L2_S_R_ADDR_VALID <= 0;
     end else begin
       state <= next_state;
       w_state <= next_w_state;
@@ -120,6 +127,15 @@ module llc #(
       latched_w_data_buffer <= next_latched_w_data_buffer;
       latched_w_requested_address <= next_latched_w_requested_address;
       cache <= next_cache;
+
+      // if(next_L2_S_R_ADDR_VALID) begin
+      //   L2_S_R_ADDR <= next_L2_S_R_ADDR;
+      //   L2_S_R_ADDR_VALID <= next_L2_S_R_ADDR_VALID;
+      // end
+      
+      L2_S_W_VALID <= next_L2_S_W_VALID;
+      L2_S_W_ADDR <= next_L2_S_W_ADDR;
+      L2_S_W_DATA <= next_L2_S_W_DATA;
     end
   end
 
@@ -128,17 +144,25 @@ always_comb begin
       IDLE: begin
         S_R_DATA_VALID = r_selected_tag == r_requested_tag && r_selected_block_is_valid && S_R_ADDR_VALID;
         S_W_READY = w_state == IDLE;
-
+        L2_S_R_ADDR_VALID = 0;
+        
         next_cache = cache;
         if (S_W_VALID) begin
           if (w_selected_tag != w_requested_tag && w_selected_block_is_dirty && w_selected_block_is_valid) begin
             next_w_state = W_REQUEST; // This state we just need to write to memory the old stuff then put in new stuff
             next_latched_w_data_buffer = cache[w_requested_index].data;
             next_latched_w_requested_address = {w_selected_tag, w_requested_index, {OFFSET_SIZE{1'b0}}};
+          end else begin
+            next_w_state = W_DONE;
           end
           next_cache[w_requested_index].data = S_W_DATA;
           next_cache[w_requested_index].tag = w_requested_tag;
           next_cache[w_requested_index].state = 2'b11;
+          
+          // TODO: TEMP CHANGE, REMOVE
+          // if(next_w_state != W_REQUEST) begin
+          //   S_W_COMPLETE = 1;
+          // end
         end else if (S_R_ADDR_VALID) begin
           next_latched_r_requested_address = S_R_ADDR;
           next_state = r_selected_tag == r_requested_tag && r_selected_block_is_valid && S_R_ADDR_VALID ? IDLE : READ_REQUEST;
@@ -176,21 +200,28 @@ always_comb begin
     endcase
 
     case (w_state) 
-      // W_IDLE: begin
-      	// Do nothing
-      // end
+      W_IDLE: begin
+      	S_W_COMPLETE = 0;
+      end
       
 			W_REQUEST: begin
+        S_W_COMPLETE = 0;
 				if(L2_S_W_READY) begin
-					L2_S_W_VALID = 1;
-					L2_S_W_ADDR = latched_w_requested_address;
-					L2_S_W_DATA = latched_w_data_buffer;
+					next_L2_S_W_VALID = 1;
+					next_L2_S_W_ADDR = latched_w_requested_address;
+					next_L2_S_W_DATA = latched_w_data_buffer;
 					next_w_state = W_DONE;
 				end
 			end
 
 			W_DONE: begin
-				next_w_state = S_W_COMPLETE ? W_IDLE : W_DONE;	
+        if(L2_S_W_COMPLETE) begin
+          next_w_state = W_IDLE;
+          S_W_COMPLETE = 1;
+        end else begin
+          next_w_state = W_DONE;
+          S_W_COMPLETE = 0;
+        end
 			end
     endcase
   end

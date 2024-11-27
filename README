@@ -35,4 +35,70 @@
 
 
 
-// TODO: PC lands in the middle of the buffer?
+// TODO:
+1. Cache Testing
+2. L1 to L2 arbitration
+
+4. Pending Instructions Decode
+5. ecall
+6. acsnoop
+7. do_pending_write
+6. Varying Memory Size read/writes
+
+6. Pipeline Testing on wp1, wp2
+7. Pipeline Testing on proj programs
+
+
+2. Memory Stage
+3. Add Load/Store Instructions
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// parameter IDLE = 2'd0,
+  //           RW_OP = 2'd1;
+
+  // logic [1:0] state, next_state;
+  // logic [2:0] ctr, next_ctr;
+
+  // always_ff  @ (posedge clk) begin
+  //   if(reset) begin
+  //     state <= IDLE;
+  //     ctr <= 0;
+  //   end else begin
+  //     state <= next_state;
+  //     ctr <= next_ctr;
+  //   end
+  // end
+
+  // always_comb begin
+    
+
+  //   if(opcode >= 1) begin
+  //     next_state = RW_OP;
+  //   end
+  // end
+
+  // always_comb begin
+  //   case(state)
+  //     IDLE: begin
+  //       next_ctr = 0;
+  //     end
+
+  //     RW_OP: begin
+  //       next_ctr = ctr == 3 ? 0 : ctr + 1;
+  //       next_state = ctr == 3 ? IDLE : RW_OP;
+  //     end
+  //   endcase
+  // end
