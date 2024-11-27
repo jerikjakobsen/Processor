@@ -66,6 +66,10 @@ module pipeline_ex
     mem_dst_reg = dst_reg;
     r2_val_mem = r2_val;
     ecall_mem = ecall;
+
+    jump_signal = 0;
+    jump_pc = 64'd0;
+    ex_res = 64'd0;
     
     case(opcode)
       ADD: begin
@@ -115,12 +119,12 @@ module pipeline_ex
       
       DIV: begin
         jump_signal = 0;
-        ex_res = r1_val / operand2;
+        ex_res = (operand2 != 0) ? (r1_val / operand2) : 64'd0;
       end
-      
+
       REM: begin
         jump_signal = 0;
-        ex_res = r1_val % operand2;
+        ex_res = (operand2 != 0) ? (r1_val % operand2) : r1_val;
       end
       
       SL: begin
@@ -130,7 +134,11 @@ module pipeline_ex
       
       SR: begin
         jump_signal = 0;
-        ex_res = r1_val >> operand2[5:0]; // Shift by lower 6 bits for 64-bit values
+        if ($signed(r1_val) < 0 && opcode == SUB) begin
+          ex_res = $signed(r1_val) >>> operand2;
+        end else begin
+          ex_res = r1_val >> operand2;
+        end
       end
 
       LOAD_REGISTER: begin
@@ -160,42 +168,42 @@ module pipeline_ex
           BEQ: begin
             if (r1_val == r2_val) begin
               jump_signal = 1;
-              jump_pc = imm;
+              jump_pc = instruction_pc + imm;
             end
           end
           
           BNE: begin
             if (r1_val != r2_val) begin
               jump_signal = 1;
-              jump_pc = imm;
+              jump_pc = instruction_pc + imm;
             end
           end
           
           BLT: begin
             if ($signed(r1_val) < $signed(r2_val)) begin
               jump_signal = 1;
-              jump_pc = imm;
+              jump_pc = instruction_pc + imm;
             end
           end
           
           BGE: begin
             if ($signed(r1_val) >= $signed(r2_val)) begin
               jump_signal = 1;
-              jump_pc = imm;
+              jump_pc = instruction_pc + imm;
             end
           end
           
           BLTU: begin
             if (r1_val < r2_val) begin
               jump_signal = 1;
-              jump_pc = imm;
+              jump_pc = instruction_pc + imm;
             end
           end
           
           BGEU: begin
             if (r1_val >= r2_val) begin
               jump_signal = 1;
-              jump_pc = imm;
+              jump_pc = instruction_pc + imm;
             end
           end
 
