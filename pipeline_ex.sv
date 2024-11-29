@@ -134,11 +134,12 @@ module pipeline_ex
       
       SR: begin
         jump_signal = 0;
-        if ($signed(r1_val) < 0 && opcode == SUB) begin
-          ex_res = $signed(r1_val) >>> operand2;
-        end else begin
-          ex_res = r1_val >> operand2;
-        end
+        ex_res = r1_val >> operand2;
+        // if ($signed(r1_val) < 0 && opcode == SUB) begin
+        //   ex_res = $signed(r1_val) >>> operand2;
+        // end else begin
+          
+        // end
       end
 
       LOAD_REGISTER: begin

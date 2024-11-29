@@ -122,14 +122,15 @@ module top
   logic L1_D_S_W_VALID;
   logic [ADDR_WIDTH-1:0] L1_D_S_W_ADDR;
   logic [DATA_WIDTH-1:0] L1_D_S_W_DATA;
+  logic [1:0] L1_D_S_W_SIZE;
   logic L1_D_S_W_READY;
   logic L1_D_S_W_COMPLETE;
   
   // L2 Cache Signals
-  logic [ADDR_WIDTH-1:0] L2_S_R_ADDR, L2_S_R_ADDR_1, L2_S_R_ADDR_2;
-  logic L2_S_R_ADDR_VALID, L2_S_R_ADDR_VALID_1, L2_S_R_ADDR_VALID_2;
-  logic [511:0] L2_S_R_DATA;
-  logic L2_S_R_DATA_VALID, L2_S_R_DATA_VALID_1, L2_S_R_DATA_VALID_2;
+  logic [ADDR_WIDTH-1:0] L2_S_R_ADDR_I, L2_S_R_ADDR_D;
+  logic L2_S_R_ADDR_VALID_I, L2_S_R_ADDR_VALID_D;
+  logic [511:0] L2_S_R_DATA_I, L2_S_R_DATA_D;
+  logic L2_S_R_DATA_VALID_I, L2_S_R_DATA_VALID_D;
 
   logic L2_S_W_VALID;
   logic [ADDR_WIDTH-1:0] L2_S_W_ADDR;
@@ -161,15 +162,23 @@ module top
   LLC llc(
     .clk(clk),
     .reset(reset),
-    .S_R_ADDR(L2_S_R_ADDR),
-    .S_R_ADDR_VALID(L2_S_R_ADDR_VALID),
-    .S_R_DATA(L2_S_R_DATA),
-    .S_R_DATA_VALID(L2_S_R_DATA_VALID),
+
+    .S1_R_ADDR(L2_S_R_ADDR_I),
+    .S1_R_ADDR_VALID(L2_S_R_ADDR_VALID_I),
+    .S1_R_DATA(L2_S_R_DATA_I),
+    .S1_R_DATA_VALID(L2_S_R_DATA_VALID_I),
+
+    .S2_R_ADDR(L2_S_R_ADDR_D),
+    .S2_R_ADDR_VALID(L2_S_R_ADDR_VALID_D),
+    .S2_R_DATA(L2_S_R_DATA_D),
+    .S2_R_DATA_VALID(L2_S_R_DATA_VALID_D),
+    
     .S_W_VALID(L2_S_W_VALID),
     .S_W_ADDR(L2_S_W_ADDR),
     .S_W_DATA(L2_S_W_DATA),
     .S_W_READY(L2_S_W_READY),
     .S_W_COMPLETE(L2_S_W_COMPLETE),
+
     .m_axi_arready(m_axi_arready),
     .m_axi_araddr(m_axi_araddr),
     .m_axi_arvalid(m_axi_arvalid),
@@ -195,10 +204,10 @@ module top
     .S_R_ADDR_VALID(L1_I_S_R_ADDR_VALID),
     .S_R_DATA(L1_I_S_R_DATA),
     .S_R_DATA_VALID(L1_I_S_R_DATA_VALID),
-    .L2_S_R_ADDR(L2_S_R_ADDR_1),
-    .L2_S_R_ADDR_VALID(L2_S_R_ADDR_VALID_1),
-    .L2_S_R_DATA(L2_S_R_DATA),
-    .L2_S_R_DATA_VALID(L2_S_R_DATA_VALID_1)
+    .L2_S_R_ADDR(L2_S_R_ADDR_I),
+    .L2_S_R_ADDR_VALID(L2_S_R_ADDR_VALID_I),
+    .L2_S_R_DATA(L2_S_R_DATA_I),
+    .L2_S_R_DATA_VALID(L2_S_R_DATA_VALID_I)
   );
 
   L1_D l1_d(
@@ -213,13 +222,14 @@ module top
     .S_W_VALID(L1_D_S_W_VALID),
     .S_W_ADDR(L1_D_S_W_ADDR),
     .S_W_DATA(L1_D_S_W_DATA),
+    .S_W_SIZE(L1_D_S_W_SIZE),
     .S_W_READY(L1_D_S_W_READY),
     .S_W_COMPLETE(L1_D_S_W_COMPLETE),
 
-    .L2_S_R_ADDR(L2_S_R_ADDR_2),
-    .L2_S_R_ADDR_VALID(L2_S_R_ADDR_VALID_2),
-    .L2_S_R_DATA(L2_S_R_DATA),
-    .L2_S_R_DATA_VALID(L2_S_R_DATA_VALID_2),
+    .L2_S_R_ADDR(L2_S_R_ADDR_D),
+    .L2_S_R_ADDR_VALID(L2_S_R_ADDR_VALID_D),
+    .L2_S_R_DATA(L2_S_R_DATA_D),
+    .L2_S_R_DATA_VALID(L2_S_R_DATA_VALID_D),
 
     .L2_S_W_VALID(L2_S_W_VALID),
     .L2_S_W_ADDR(L2_S_W_ADDR),
@@ -327,27 +337,6 @@ module top
     end else if(ecall && !ecall_done) begin
       // Wait for ecall done
     end else begin
-      if(L2_S_R_ADDR_VALID_2) begin
-        L2_S_R_ADDR <= L2_S_R_ADDR_2;
-        L2_S_R_ADDR_VALID <= L2_S_R_ADDR_VALID_2;
-      end else if(L2_S_R_ADDR_VALID_1) begin
-        L2_S_R_ADDR <= L2_S_R_ADDR_1;
-        L2_S_R_ADDR_VALID <= L2_S_R_ADDR_VALID_1;
-      end else begin
-        L2_S_R_ADDR_VALID <= 0;
-      end
-
-      if(L2_S_R_DATA_VALID) begin
-        if(L2_S_R_ADDR_VALID_2) begin
-          L2_S_R_DATA_VALID_2 <= L2_S_R_DATA_VALID;
-        end else if(L2_S_R_ADDR_VALID_1) begin
-          L2_S_R_DATA_VALID_1 <= L2_S_R_DATA_VALID;
-        end
-      end else begin
-        L2_S_R_DATA_VALID_2 <= L2_S_R_DATA_VALID;
-        L2_S_R_DATA_VALID_1 <= L2_S_R_DATA_VALID;
-      end
-
       if(mem_ready) begin
           ex_res <= next_ex_res;
           r2_val_mem <= next_r2_val_mem;

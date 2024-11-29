@@ -284,13 +284,13 @@ module pipeline_decode
             7'b0000001: begin
               case (funct3)
                 3'b000: ex_opcode = MUL;    // MUL
-                3'b001: ex_opcode = MULH;   // MULH
-                3'b010: ex_opcode = MULHSU; // MULHSU
-                3'b011: ex_opcode = MULHU;  // MULHU
+                3'b001: ex_opcode = MUL;   // MULH
+                3'b010: ex_opcode = MUL; // MULHSU
+                3'b011: ex_opcode = MUL;  // MULHU
                 3'b100: ex_opcode = DIV;    // DIV
-                3'b101: ex_opcode = DIVU;   // DIVU
+                3'b101: ex_opcode = DIV;   // DIVU
                 3'b110: ex_opcode = REM;    // REM
-                3'b111: ex_opcode = REMU;   // REMU
+                3'b111: ex_opcode = REM;   // REMU
               endcase
             end
           endcase
@@ -324,9 +324,9 @@ module pipeline_decode
               case (funct3)
                 3'b000: ex_opcode = MUL;   // MULW
                 3'b100: ex_opcode = DIV;   // DIVW
-                3'b101: ex_opcode = DIVU;  // DIVUW
+                3'b101: ex_opcode = DIV;  // DIVUW
                 3'b110: ex_opcode = REM;   // REMW
-                3'b111: ex_opcode = REMU;  // REMUW
+                3'b111: ex_opcode = REM;  // REMUW
               endcase
             end
           endcase
