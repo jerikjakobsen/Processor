@@ -164,6 +164,10 @@ module LLC #(
     end
 
   always_ff @ (posedge clk) begin
+    if(w_state == AXI_W_DONE && m_axi_bvalid) begin
+        do_pending_write(latched_w_requested_address, latched_w_data_buffer, 64);
+    end
+
     if (reset) begin
       state <= IDLE;
     end else begin

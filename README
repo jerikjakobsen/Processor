@@ -37,8 +37,7 @@
 
 // TODO:
 6. acsnoop
-7. do_pending_write
-6. Varying Memory Size read/writes
+6. Varying Memory Size read
 
 6. Pipeline Testing on wp1, wp2
 7. Pipeline Testing on proj programs
@@ -50,10 +49,12 @@
 3. Add Load/Store Instructions
 4. Pending Instructions Decode
 5. ecall
+6. Varying Memory Size writes
 
 
 1. Cache Testing
 2. L1 to L2 arbitration
+7. do_pending_write
 
 
 

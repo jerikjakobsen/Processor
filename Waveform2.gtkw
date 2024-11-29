@@ -1,19 +1,19 @@
 [*]
 [*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
-[*] Wed Nov 27 05:43:33 2024
+[*] Fri Nov 29 08:40:00 2024
 [*]
 [dumpfile] "/home/kuchadha/cse_502_cpu/trace.vcd"
-[dumpfile_mtime] "Wed Nov 27 05:40:11 2024"
-[dumpfile_size] 14338261
+[dumpfile_mtime] "Fri Nov 29 08:21:40 2024"
+[dumpfile_size] 41594201
 [savefile] "/home/kuchadha/cse_502_cpu/Waveform2.gtkw"
-[timestart] 62871
+[timestart] 107430
 [size] 1512 865
 [pos] -1 -1
-*-10.000000 64000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-10.000000 109000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.top.
 [sst_width] 210
-[signals_width] 227
+[signals_width] 250
 [sst_expanded] 1
 [sst_vpaned_height] 247
 @28
@@ -115,6 +115,7 @@ TOP.top.id_stage.r1_reg[4:0]
 TOP.top.id_stage.r2_reg[4:0]
 [color] 2
 TOP.top.id_stage.dst_reg[4:0]
+@420
 [color] 2
 TOP.top.id_stage.imm[63:0]
 @28
@@ -125,15 +126,17 @@ TOP.top.id_stage.imm_or_reg2
 TOP.top.id_stage.ex_opcode[6:0]
 [color] 2
 TOP.top.id_stage.mem_opcode[6:0]
+TOP.top.id_stage.mem_operation_size[3:0]
 @200
 -
 -EX
-@24
+@25
 [color] 7
 TOP.top.ex_stage.instruction_pc[63:0]
+@24
 [color] 7
 TOP.top.ex_stage.opcode[6:0]
-@22
+@420
 TOP.top.ex_stage.imm[63:0]
 @24
 TOP.top.ex_stage.ex_res[63:0]
@@ -143,16 +146,32 @@ TOP.top.ex_stage.ex_res[63:0]
 @24
 TOP.top.mem_stage.opcode[6:0]
 TOP.top.mem_stage.ex_res[63:0]
+@22
+TOP.top.mem_stage.mem_operation_size[3:0]
 @200
 -
 -REG
 @22
 TOP.top.rf.registers(0)[63:0]
 TOP.top.rf.registers(1)[63:0]
+@420
 TOP.top.rf.registers(2)[63:0]
-@23
-TOP.top.rf.registers(6)[63:0]
 @22
+TOP.top.rf.registers(6)[63:0]
+@24
 TOP.top.rf.registers(8)[63:0]
+@22
+TOP.top.rf.registers(15)[63:0]
+@200
+-
+-
+@24
+TOP.top.if_stage.S_R_ADDR[63:0]
+@28
+TOP.top.if_stage.S_R_ADDR_VALID
+@22
+TOP.top.if_stage.S_R_DATA[31:0]
+@28
+TOP.top.if_stage.S_R_DATA_VALID
 [pattern_trace] 1
 [pattern_trace] 0

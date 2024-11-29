@@ -85,6 +85,8 @@ module pipeline_memory
           next_state = WRITE_REQUEST;
           ready = 0;
         end else begin
+          wb_enable = 1;
+          wb_dst_val = ex_res;
           next_state = IDLE;
           ready = 1;
         end
@@ -104,6 +106,7 @@ module pipeline_memory
       WRITE_REQUEST: begin
         wb_enable = 0;
         if(S_W_COMPLETE) begin
+          wb_enable = 1;
           next_state = IDLE;
           ready = 1;
         end else begin
