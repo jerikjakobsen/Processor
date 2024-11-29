@@ -1,19 +1,19 @@
 [*]
 [*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
-[*] Fri Nov 29 08:40:00 2024
+[*] Fri Nov 29 09:23:41 2024
 [*]
 [dumpfile] "/home/kuchadha/cse_502_cpu/trace.vcd"
-[dumpfile_mtime] "Fri Nov 29 08:21:40 2024"
-[dumpfile_size] 41594201
+[dumpfile_mtime] "Fri Nov 29 08:52:39 2024"
+[dumpfile_size] 6263512
 [savefile] "/home/kuchadha/cse_502_cpu/Waveform2.gtkw"
-[timestart] 107430
+[timestart] 395787
 [size] 1512 865
 [pos] -1 -1
-*-10.000000 109000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-9.000000 396826 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.top.
 [sst_width] 210
-[signals_width] 250
+[signals_width] 306
 [sst_expanded] 1
 [sst_vpaned_height] 247
 @28
@@ -22,7 +22,7 @@ TOP.top.reset
 @200
 -
 -TOP
-@c00024
+@d00023
 TOP.top.pc[63:0]
 @28
 (0)TOP.top.pc[63:0]
@@ -89,24 +89,22 @@ TOP.top.pc[63:0]
 (61)TOP.top.pc[63:0]
 (62)TOP.top.pc[63:0]
 (63)TOP.top.pc[63:0]
-@1401200
+@1401201
 -group_end
 @200
 -
 -IF
-@24
+@22
 [color] 3
 TOP.top.if_stage.pc[63:0]
-@22
 [color] 3
 TOP.top.if_stage.instruction[31:0]
 @200
 -
 -ID
-@24
+@22
 [color] 2
 TOP.top.id_stage.instruction_pc[63:0]
-@22
 [color] 2
 TOP.top.id_stage.instruction[31:0]
 [color] 2
@@ -115,7 +113,6 @@ TOP.top.id_stage.r1_reg[4:0]
 TOP.top.id_stage.r2_reg[4:0]
 [color] 2
 TOP.top.id_stage.dst_reg[4:0]
-@420
 [color] 2
 TOP.top.id_stage.imm[63:0]
 @28
@@ -127,26 +124,34 @@ TOP.top.id_stage.ex_opcode[6:0]
 [color] 2
 TOP.top.id_stage.mem_opcode[6:0]
 TOP.top.id_stage.mem_operation_size[3:0]
+@28
+TOP.top.id_stage.ecall
 @200
 -
 -EX
-@25
+@22
 [color] 7
 TOP.top.ex_stage.instruction_pc[63:0]
 @24
 [color] 7
 TOP.top.ex_stage.opcode[6:0]
+@22
+TOP.top.ex_stage.branch_type[3:0]
 @420
 TOP.top.ex_stage.imm[63:0]
-@24
+@22
 TOP.top.ex_stage.ex_res[63:0]
+@28
+TOP.top.ex_stage.jump_signal
+@22
+TOP.top.ex_stage.jump_pc[63:0]
 @200
 -
 -MEM
 @24
 TOP.top.mem_stage.opcode[6:0]
-TOP.top.mem_stage.ex_res[63:0]
 @22
+TOP.top.mem_stage.ex_res[63:0]
 TOP.top.mem_stage.mem_operation_size[3:0]
 @200
 -
@@ -157,10 +162,12 @@ TOP.top.rf.registers(1)[63:0]
 @420
 TOP.top.rf.registers(2)[63:0]
 @22
+TOP.top.rf.registers(3)[63:0]
 TOP.top.rf.registers(6)[63:0]
 @24
 TOP.top.rf.registers(8)[63:0]
 @22
+TOP.top.rf.registers(10)[63:0]
 TOP.top.rf.registers(15)[63:0]
 @200
 -
