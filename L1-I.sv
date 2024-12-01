@@ -24,7 +24,9 @@ module L1_I #(
     output wire L2_S_R_ADDR_VALID,
 
     input wire [511:0] L2_S_R_DATA,
-    input wire L2_S_R_DATA_VALID
+    input wire L2_S_R_DATA_VALID,
+    input wire [63:0] m_axi_acaddr,
+    input wire [3:0] m_axi_acsnoop
 );
 
   `define ADDRESS_OFFSET_SLICE (OFFSET_SIZE-1):0

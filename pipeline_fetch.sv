@@ -39,10 +39,61 @@ module pipeline_fetch
   always_comb begin
     if(S_R_DATA_VALID) begin
       instruction = S_R_DATA;
+      /* TEMP CHANGES */
+      // case(pc)
+      //   0: begin
+      //     instruction = 32'h04113c23; // sd	x1,88(x2)
+      //   end
+      //   4: begin
+      //     instruction = 32'h00500093; // addi x1, x0, 5
+      //   end
+      //   8: begin
+      //     instruction = 32'h04113c23; // sd	x1,88(x2)
+      //   end
+      //   12: begin
+      //     instruction = 32'h005013083; // ld	x1,88(x2)
+      //     // instruction = 32'h05813083; // ld	x1,80(x2)
+      //   end
+      //   16: begin
+      //     instruction = 32'h05813083; // ld	x1,80(x2)
+      //   end
+      //   20: begin
+      //     instruction = 32'h05813103;
+      //   end
+      //   default: begin
+      //     instruction = 90;
+      //   end
+      // endcase
+
+
+      // case(pc)
+      //   0: begin
+      //     instruction = 32'h04b43023;
+      //   end
+      //   4: begin
+      //     instruction = 32'h04c4b023;
+      //   end
+      //   8: begin
+      //     instruction = 32'h04d53023;
+      //   end
+      //   12: begin
+      //     instruction = 32'h04053703;
+      //   end
+      //   16: begin
+      //     instruction = 32'h0404b783;
+      //   end
+      //   20: begin
+      //     instruction = 32'h04043803;
+      //   end
+      //   default: begin
+      //     instruction = 90;
+      //   end
+      // endcase
+
       next_stage_pc = pc;
-      next_if_pc = pc + 4;
+      next_if_pc = instruction == 90 ? pc : pc + 4;
     end else begin
-      instruction = 0;
+      instruction = 90;
       next_stage_pc = 0;
       next_if_pc = pc;
     end

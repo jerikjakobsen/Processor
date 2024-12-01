@@ -27,7 +27,7 @@ module pipeline_memory
     output wire S_W_VALID,
     output wire [ADDR_WIDTH-1:0] S_W_ADDR,
     output wire [DATA_WIDTH-1:0] S_W_DATA,
-    output wire [1:0] S_W_SIZE,
+    output wire [3:0] S_W_SIZE,
     input wire S_W_READY,
     input wire S_W_COMPLETE
 );
@@ -35,8 +35,19 @@ module pipeline_memory
             READ_REQUEST = 3'd1,
             READ = 3'd3,
             WRITE_REQUEST = 3'd4;
+  
+  parameter BYTE  = 3'd0,
+            HALF_WORD  = 3'd1,
+            WORD = 3'd2,
+            DOUBLE_WORD = 3'd3,
+            UNSIGNED_WORD = 3'd4,
+            UNSIGNED_HALF_WORD  = 3'd5,
+            UNSIGNED_BYTE  = 3'd6;
 
   logic [2:0] state, next_state;
+  logic tmp_signal;
+
+  assign tmp_signal = S_R_ADDR == 63'h841A0;
 
   always_ff  @ (posedge clk) begin
     if(reset) begin
@@ -71,10 +82,10 @@ module pipeline_memory
 
   always_comb begin
     wb_dst_reg = dst_reg;
-    ecall_wb = ecall;
 
     case(state)
       IDLE: begin
+        wb_enable = 0;
         if(opcode == 0) begin
           next_state = IDLE;
           ready = 1;
@@ -84,9 +95,13 @@ module pipeline_memory
         end else if (opcode == 2) begin
           next_state = WRITE_REQUEST;
           ready = 0;
-        end else begin
+        end else if (opcode == 3) begin
           wb_enable = 1;
           wb_dst_val = ex_res;
+          next_state = IDLE;
+          ready = 1;
+        end else begin
+          ecall_wb = ecall;
           next_state = IDLE;
           ready = 1;
         end
@@ -96,7 +111,36 @@ module pipeline_memory
         if (S_R_DATA_VALID) begin
             next_state = IDLE;
             wb_enable = 1;
-            wb_dst_val = S_R_DATA; // TODO: Handle based on operation size
+
+            case(mem_operation_size)
+              BYTE: begin // LB
+                wb_dst_val = $signed(S_R_DATA[7:0]);
+              end
+
+              UNSIGNED_BYTE: begin // LBU
+                wb_dst_val = {56'b0, S_R_DATA[7:0]};
+              end
+
+              HALF_WORD: begin // LH
+                wb_dst_val = $signed(S_R_DATA[15:0]);
+              end
+
+              UNSIGNED_HALF_WORD: begin // LHU
+                wb_dst_val = {48'b0, S_R_DATA[15:0]};
+              end
+              
+              WORD: begin // LW
+                wb_dst_val = $signed(S_R_DATA[31:0]);
+              end
+
+              UNSIGNED_WORD: begin // LWU
+                wb_dst_val = {32'b0, S_R_DATA[31:0]};
+              end
+
+              DOUBLE_WORD: begin // LD
+                wb_dst_val = S_R_DATA;
+              end
+            endcase
             ready = 1;
         end else begin
           wb_enable = 0;
@@ -106,7 +150,6 @@ module pipeline_memory
       WRITE_REQUEST: begin
         wb_enable = 0;
         if(S_W_COMPLETE) begin
-          wb_enable = 1;
           next_state = IDLE;
           ready = 1;
         end else begin

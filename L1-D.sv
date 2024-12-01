@@ -22,7 +22,7 @@ module L1_D #(
     input wire S_W_VALID,
     input wire [63:0] S_W_ADDR,
     input wire [63:0] S_W_DATA,
-    input wire [1:0] S_W_SIZE,
+    input wire [3:0] S_W_SIZE,
     output wire S_W_READY,
     output wire S_W_COMPLETE,
 
@@ -39,12 +39,19 @@ module L1_D #(
     output wire [63:0] L2_S_W_ADDR,
     output wire [511:0] L2_S_W_DATA,
     input wire L2_S_W_READY,
-    input wire L2_S_W_COMPLETE
+    input wire L2_S_W_COMPLETE,
+    input wire [63:0] m_axi_acaddr,
+    input wire [3:0] m_axi_acsnoop
 );
 
     `define ADDRESS_OFFSET_SLICE (OFFSET_SIZE-1):0
     `define ADDRESS_INDEX_SLICE (OFFSET_SIZE+INDEX_SIZE-1):OFFSET_SIZE
     `define ADDRESS_TAG_SLICE (OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1):(OFFSET_SIZE+INDEX_SIZE)
+
+    parameter BYTE  = 3'd0,
+            HALF_WORD  = 3'd1,
+            WORD = 3'd2,
+            DOUBLE_WORD = 3'd3;
 
     // States
     parameter IDLE = 0,
@@ -70,11 +77,19 @@ module L1_D #(
     logic [511:0] latched_w_data_buffer, next_latched_w_data_buffer;
     logic conflicting_tags;
 
+		logic tmp_signal;
+		assign tmp_signal = S_W_ADDR == 63'h841A0;
+
     typedef struct packed {
         logic [DATA_SIZE-1:0] data;       // Data section (e.g., 512 bits)
         logic [1:0] state;               // State section (e.g., 2 bits for valid/dirty)
         logic [TAG_SIZE-1:0] tag;        // Tag section (e.g., 52 bits)
     } cache_line_t;
+
+
+    logic [63:0] test_signal;
+    logic [63:0] test2_signal;
+    logic [63:0] test3_signal;
 
     cache_line_t [LINE_COUNT-1:0] cache, next_cache;
     logic [2:0] r_buffer_index, next_r_buffer_index, w_buffer_index, next_w_buffer_index;
@@ -92,9 +107,15 @@ module L1_D #(
     logic r_selected_block_is_valid, w_selected_block_is_valid, r_selected_block_is_dirty, w_selected_block_is_dirty;
     logic [DATA_SIZE-1:0] r_selected_data, w_selected_data, latched_w_selected_data;
 
-    logic [TAG_SIZE-1:0] r_requested_tag, r_selected_tag, latched_r_requested_tag, w_selected_tag, w_requested_tag, latched_w_requested_tag, latched_w_selected_tag;
-    logic [INDEX_SIZE-1:0] r_requested_index, latched_r_requested_index, w_requested_index, latched_w_requested_index;
+    logic [TAG_SIZE-1:0] r_requested_tag, r_selected_tag, latched_r_requested_tag, w_selected_tag, w_requested_tag, latched_w_requested_tag, latched_w_selected_tag, ac_addr_requested_tag;
+    logic [INDEX_SIZE-1:0] r_requested_index, latched_r_requested_index, w_requested_index, latched_w_requested_index, ac_addr_requested_index;
     logic [OFFSET_SIZE-1:0] r_requested_offset;
+
+    assign test_signal = latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]; // cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 63-:64]; //            latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 63-:64
+    assign test2_signal = latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]; // cache[58].data[56*8 + 63-:64]; // cache[57].data[24 + 63-:64];
+    // assign test3_signal = cache[1].data[0*8 + 63-:64];
+    assign test3_signal = cache[58].data[56*8 + 63-:64];
+
     always_comb begin // Convenience signals
       // Read Signals
       r_requested_tag = S_R_ADDR[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE]; // Combinatorial access to requested address for read
@@ -109,8 +130,11 @@ module L1_D #(
       latched_r_requested_tag = latched_r_requested_address[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE]; // Combinatorial access to latched address for read
       latched_r_requested_index = latched_r_requested_address[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]; // Combinatorial access to latched address for read
 
-      S_R_DATA = r_selected_data[(r_requested_offset + 8)*8-1 -:64];
-      S_R_DATA_VALID = (r_selected_tag == r_requested_tag && r_selected_block_is_valid);
+			ac_addr_requested_tag = m_axi_acaddr[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE];
+			ac_addr_requested_index = m_axi_acaddr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE];
+
+      S_R_DATA = r_selected_data[(r_requested_offset + 8)*8-1 -:64]; // r_selected_data[(r_requested_offset + 8)*8-1 -:64];
+      S_R_DATA_VALID = S_R_ADDR_VALID && (r_selected_tag == r_requested_tag && r_selected_block_is_valid);
 
       // Write Signals
       w_requested_tag = S_W_ADDR[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE];
@@ -128,6 +152,8 @@ module L1_D #(
 
       S_W_READY = !latched_s_w_contains_request;
     end
+
+
 
   always_ff @ (posedge clk) begin
     if (reset) begin
@@ -165,52 +191,56 @@ always_comb begin
     case (state) 
         IDLE: begin
             S_W_COMPLETE = 0;
-            if (S_R_ADDR_VALID && (r_requested_tag != r_selected_tag || !r_selected_block_is_valid)) begin
-                next_latched_r_requested_address = S_R_ADDR;
-                next_r_state = L2_R_REQUEST;
-                if (r_selected_block_is_dirty && r_selected_block_is_valid) begin // Must evict
-                    next_state = W_R_REQUEST;
-                    next_latched_w_data_buffer = cache[r_requested_index].data;
-                    next_latched_w_requested_address = {r_selected_tag, r_requested_index, {OFFSET_SIZE{1'b0}}};
-                    next_w_state = L2_W_REQUEST;
-                end else begin
-                    next_state = R_REQUEST;
-                end
-            end else if (latched_s_w_contains_request) begin
-                if (cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].tag == latched_s_w_request_addr[`ADDRESS_TAG_SLICE] && cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].state[1]) begin
-                    // We have the block we're trying to write to
-                    next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].state = 2'b11;
-                    case (latched_s_w_request_size)
-                        2'b00: begin
-                            next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 7-:8] = latched_s_w_request_data[7:0];
-                        end
-                        2'b01: begin
-                            next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 15-:16] = latched_s_w_request_data[15:0];
-                        end
-                        2'b10: begin
-                            next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 31-:32] = latched_s_w_request_data[31:0];
-                        end
-                        2'b11: begin
-                            next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 63-:64] = latched_s_w_request_data;
-                        end
-                    endcase
-                    next_state = W_DONE;
-                end else begin
-                    // We do not have the block we're trying to write to
-                    next_r_state = L2_R_REQUEST;
-                    next_latched_r_requested_address = latched_s_w_request_addr;
-                    if (cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].tag != latched_s_w_request_addr[`ADDRESS_INDEX_SLICE] && cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].state[1] && cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].state[0]) begin // Tags do not match, and block dirty
-                        // Conflict Must Write old data, read in new data, write to new data
-                        next_state = R_W_PENDING_CACHE_WRITE;
-                        next_w_state = L2_W_REQUEST;
-                        next_latched_w_data_buffer = cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data;
-                        next_latched_w_requested_address = {cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].tag, latched_s_w_request_addr[`ADDRESS_INDEX_SLICE], {OFFSET_SIZE{1'b0}}};
-                    end else begin
-                        // No Conflict,  can just read in new data, then write to it
-                        next_state = R_PENDING_CACHE_WRITE;
-                    end
-                end
-            end
+            if(m_axi_acsnoop && cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
+							next_cache[ac_addr_requested_index].state[1] = 0;
+						end else begin
+							if (S_R_ADDR_VALID && (r_requested_tag != r_selected_tag || !r_selected_block_is_valid)) begin
+									next_latched_r_requested_address = S_R_ADDR;
+									next_r_state = L2_R_REQUEST;
+									if (r_selected_block_is_dirty && r_selected_block_is_valid) begin // Must evict
+											next_state = W_R_REQUEST;
+											next_latched_w_data_buffer = cache[r_requested_index].data;
+											next_latched_w_requested_address = {r_selected_tag, r_requested_index, {OFFSET_SIZE{1'b0}}};
+											next_w_state = L2_W_REQUEST;
+									end else begin
+											next_state = R_REQUEST;
+									end
+							end else if (latched_s_w_contains_request) begin
+									if (cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].tag == latched_s_w_request_addr[`ADDRESS_TAG_SLICE] && cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].state[1]) begin
+											// We have the block we're trying to write to
+											next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].state = 2'b11;
+											case (latched_s_w_request_size)
+													BYTE: begin
+															next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 7-:8] = latched_s_w_request_data[7:0];
+													end
+													HALF_WORD: begin
+															next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 15-:16] = latched_s_w_request_data[15:0];
+													end
+													WORD: begin
+															next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 31-:32] = latched_s_w_request_data[31:0];
+													end
+													DOUBLE_WORD: begin
+															next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 63-:64] = latched_s_w_request_data;
+													end
+											endcase
+											next_state = W_DONE;
+									end else begin
+											// We do not have the block we're trying to write to
+											next_r_state = L2_R_REQUEST;
+											next_latched_r_requested_address = latched_s_w_request_addr;
+											if (cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].tag != latched_s_w_request_addr[`ADDRESS_TAG_SLICE] && cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].state[1] && cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].state[0]) begin // Tags do not match, and block dirty
+													// Conflict Must Write old data, read in new data, write to new data
+													next_state = R_W_PENDING_CACHE_WRITE;
+													next_w_state = L2_W_REQUEST;
+													next_latched_w_data_buffer = cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data;
+													next_latched_w_requested_address = {cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].tag, latched_s_w_request_addr[`ADDRESS_INDEX_SLICE], {OFFSET_SIZE{1'b0}}};
+											end else begin
+													// No Conflict or conflict and not dirty,  can just read in new data, then write to it
+													next_state = R_PENDING_CACHE_WRITE;
+											end
+									end
+							end
+						end
         end
         W_R_REQUEST: begin // Read miss and overwriting dirty data (must save dirty data at same time)
             // At this point latched_w_data_buffer, latched_w_requested_address, latched_r_requested_address should contain valid data
@@ -230,17 +260,17 @@ always_comb begin
                 next_state = W_DONE;
                 next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].state = 2'b11;
                 case (latched_s_w_request_size)
-                    2'b00: begin
-                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 7-:8] = latched_s_w_request_data[7:0];
+                    BYTE: begin
+                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 7-:8] = latched_s_w_request_data[7:0];
                     end
-                    2'b01: begin
-                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 15-:16] = latched_s_w_request_data[15:0];
+                    HALF_WORD: begin
+                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 15-:16] = latched_s_w_request_data[15:0];
                     end
-                    2'b10: begin
-                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 31-:32] = latched_s_w_request_data[31:0];
+                    WORD: begin
+                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 31-:32] = latched_s_w_request_data[31:0];
                     end
-                    2'b11: begin
-                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 63-:64] = latched_s_w_request_data;
+                    DOUBLE_WORD: begin
+                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 63-:64] = latched_s_w_request_data;
                     end
                 endcase
             end 
@@ -250,17 +280,17 @@ always_comb begin
                 next_state = W_DONE;
                 next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].state = 2'b11;
                 case (latched_s_w_request_size)
-                    2'b00: begin
-                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 7-:8] = latched_s_w_request_data[7:0];
+                    BYTE: begin
+                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 7-:8] = latched_s_w_request_data[7:0];
                     end
-                    2'b01: begin
-                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 15-:16] = latched_s_w_request_data[15:0];
+                    HALF_WORD: begin
+                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 15-:16] = latched_s_w_request_data[15:0];
                     end
-                    2'b10: begin
-                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 31-:32] = latched_s_w_request_data[31:0];
+                    WORD: begin
+                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 31-:32] = latched_s_w_request_data[31:0];
                     end
-                    2'b11: begin
-                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 63-:64] = latched_s_w_request_data;
+                    DOUBLE_WORD: begin
+                        next_cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 63-:64] = latched_s_w_request_data;
                     end
                 endcase
             end
@@ -283,10 +313,10 @@ always_comb begin
         L2_R_REQUEST: begin
             L2_S_R_ADDR = latched_r_requested_address;
             L2_S_R_ADDR_VALID = 1;
-            
         end
-    endcase 
+    endcase
 end
+
 always_comb begin
     case (r_state)
         L2_R_REQUEST: begin
@@ -299,8 +329,8 @@ always_comb begin
         end
     endcase 
 end
-//Write
 
+//Write
 always_comb begin
     case (w_state)
         L2_W_IDLE: begin
@@ -309,15 +339,19 @@ always_comb begin
         L2_W_REQUEST: begin
             L2_S_W_VALID = 1;
             L2_S_W_DATA = latched_w_data_buffer;
+            test3_signal = latched_w_data_buffer[56*8 + 63-:64];
             L2_S_W_ADDR = latched_w_requested_address;
         end
         // L2_W_MEM: begin
 
         // end
-        // L2_W_DONE: begin
-        // end
+
+        L2_W_DONE: begin
+            L2_S_W_VALID = 0;
+        end
     endcase 
 end
+
 always_comb begin
     case (w_state)
 

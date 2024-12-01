@@ -34,6 +34,8 @@
   > make submit
 
 
+104d8
+
 
 // TODO:
 6. acsnoop
@@ -371,3 +373,9 @@
 //  388:	01813483          	ld	x9,24(x2)
 //  38c:	03010113          	addi	x2,x2,48
 //  390:	00008067          	ret
+
+
+
+
+QUESTIONS:
+- Do we need to call do_pending_write on every write back or only when we write to mem on AXI?

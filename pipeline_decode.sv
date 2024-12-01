@@ -18,6 +18,7 @@ module pipeline_decode
     output wire [4:0] dst_reg,
     output wire signed [DATA_WIDTH-1:0] imm,
     output wire is_word_op,
+    output wire [2:0] unsigned_op,
     output wire imm_or_reg2,
     output wire [6:0] mem_opcode,
     output wire [3:0] mem_operation_size,
@@ -34,27 +35,27 @@ module pipeline_decode
             AND = 4'd4,
             XOR = 4'd5,
             MUL = 4'd6,
-            DIV = 4'd7,
-            REM = 4'd8,
-            SL = 4'd9,
-            SR = 4'd10,
-            JUMP = 4'd11,
-            PC_ADD = 4'd12,
-            LOAD_REGISTER = 4'd13;
+            MULH = 4'd7,
+            DIV = 4'd8,
+            REM = 4'd9,
+            SHIFT_LEFT = 4'd10,
+            SHIFT_RIGHT = 4'd11,
+            SET_LESS_THAN = 4'd12,
+            JUMP = 4'd13,
+            PC_ADD = 4'd14,
+            LOAD_REGISTER = 4'd15;
   
   parameter BEQ  = 3'b000,
             BNE  = 3'b001,
             BLT  = 3'b010,
             BGE  = 3'b011,
-            BLTU = 3'b100,
-            BGEU = 3'b101,
             JAL = 3'b110,
             JALR = 3'b111;
 
-  parameter DOUBLE_WORD = 3'd0,
-            WORD = 3'd1,
-            HALF_WORD  = 3'd2,
-            BYTE  = 3'd3,
+  parameter BYTE  = 3'd0,
+            HALF_WORD  = 3'd1,
+            WORD = 3'd2,
+            DOUBLE_WORD = 3'd3,
             UNSIGNED_WORD = 3'd4,
             UNSIGNED_HALF_WORD  = 3'd5,
             UNSIGNED_BYTE  = 3'd6;
@@ -64,15 +65,25 @@ module pipeline_decode
   logic [6:0] funct7;
 
   always_comb begin
-    ready = (instruction == 0 || next_stage_ready);
+    ready = (instruction == 90 || next_stage_ready);
     next_stage_pc = instruction_pc;
   end
 
+  // always_ff @ (posedge clk) begin
+  //   if(ecall) begin
+  //     $display("ECALL at: %x", instruction_pc);
+  //   end
+  // end
+
   always_comb begin
     ecall = 0;
-    if(instruction == 0) begin
+    if(instruction == 90) begin
       // NOP
       ex_opcode = 0;
+      mem_opcode = 0;
+      dst_reg = 0;
+      r1_reg = 0;
+      r2_reg = 0;
     end else begin
       opcode = instruction[6:0];
       case (opcode)
@@ -80,72 +91,52 @@ module pipeline_decode
             funct3 = instruction[14:12];
             funct7 = instruction[31:25];
             mem_opcode = 3;
+            imm_or_reg2 = IMM;
+            dst_reg = instruction[11:7];
+            r1_reg = instruction[19:15];
+            unsigned_op = 0;
+            is_word_op = 0;
 
             case (funct3)
                 3'b000: begin // ADDI
                   ex_opcode = ADD;
-                  imm_or_reg2 = IMM;
                   imm = {{52{instruction[31]}}, instruction[31:20]};
-                  dst_reg = instruction[11:7];
-                  r1_reg = instruction[19:15];
                 end
                 3'b010: begin // SLTI
-                  ex_opcode = SL;
-                  imm_or_reg2 = IMM;
+                  ex_opcode = SET_LESS_THAN;
                   imm = {{52{instruction[31]}}, instruction[31:20]};
-                  dst_reg = instruction[11:7];
-                  r1_reg = instruction[19:15];
                 end
                 3'b011: begin // SLTIU
-                  ex_opcode = SL;
-                  imm_or_reg2 = IMM;
+                  ex_opcode = SET_LESS_THAN;
                   imm = {{52{instruction[31]}}, instruction[31:20]};
-                  dst_reg = instruction[11:7];
-                  r1_reg = instruction[19:15];
+                  unsigned_op = 1;
                 end
                 3'b100: begin // XORI
                   ex_opcode = XOR;
-                  imm_or_reg2 = IMM;
                   imm = {{52{instruction[31]}}, instruction[31:20]};
-                  dst_reg = instruction[11:7];
-                  r1_reg = instruction[19:15];
                 end
                 3'b110: begin // ORI
                   ex_opcode = OR;
-                  imm_or_reg2 = IMM;
                   imm = {{52{instruction[31]}}, instruction[31:20]};
-                  dst_reg = instruction[11:7];
-                  r1_reg = instruction[19:15];
                 end
                 3'b111: begin // ANDI
                   ex_opcode = AND;
-                  imm_or_reg2 = IMM;
                   imm = {{52{instruction[31]}}, instruction[31:20]};
-                  dst_reg = instruction[11:7];
-                  r1_reg = instruction[19:15];
                 end
                 3'b001: begin // SLLI
-                  ex_opcode = SL;
-                  imm_or_reg2 = IMM;
-                  imm = instruction[24:20];
-                  dst_reg = instruction[11:7];
-                  r1_reg = instruction[19:15];
+                  ex_opcode = SHIFT_LEFT;
+                  imm = {{58{1'b0}}, instruction[24:20]};
                 end
                 3'b101: begin
                   case (funct7)
                     7'b0000000: begin // SRLI
-                      ex_opcode = SR;
-                      imm_or_reg2 = IMM;
-                      imm = instruction[24:20];
-                      dst_reg = instruction[11:7];
-                      r1_reg = instruction[19:15];
+                      ex_opcode = SHIFT_RIGHT;
+                      imm = {{58{1'b0}}, instruction[24:20]};
+                      unsigned_op = 1;
                     end
                     7'b0100000: begin // SRAI
-                      ex_opcode = SR;
-                      imm_or_reg2 = IMM;
-                      imm = instruction[24:20];
-                      dst_reg = instruction[11:7];
-                      r1_reg = instruction[19:15];
+                      ex_opcode = SHIFT_RIGHT;
+                      imm = {{58{1'b0}}, instruction[24:20]};
                     end
                   endcase
                 end
@@ -163,90 +154,37 @@ module pipeline_decode
           funct3 = instruction[14:12];
           funct7 = instruction[31:25];
           mem_opcode = 3;
+          is_word_op = 1;
+          unsigned_op = 0;
+          imm_or_reg2 = IMM;
+          dst_reg = instruction[11:7];
+          r1_reg = instruction[19:15];
 
           case(funct3)
             3'b000: begin // ADDIW
               ex_opcode = ADD;
-              imm_or_reg2 = IMM;
               imm = {{52{instruction[31]}}, instruction[31:20]};
-              dst_reg = instruction[11:7];
-              r1_reg = instruction[19:15];
-              is_word_op = 1;
             end
+
             3'b001: begin // SLLIW
-              ex_opcode = SL;
-              imm_or_reg2 = IMM;
-              imm = instruction[24:20];
-              dst_reg = instruction[11:7];
-              r1_reg = instruction[19:15];
-              is_word_op = 1;
+              ex_opcode = SHIFT_LEFT;
+              imm = {{58{1'b0}}, instruction[24:20]};
             end
+
             3'b101: begin
               case (funct7)
                 7'b0000000: begin // SRLIW
-                  ex_opcode = SR;
-                  imm_or_reg2 = IMM;
-                  imm = instruction[24:20];
-                  dst_reg = instruction[11:7];
-                  r1_reg = instruction[19:15];
-                  is_word_op = 1;
+                  ex_opcode = SHIFT_RIGHT;
+                  imm = {{58{1'b0}}, instruction[24:20]};
+                  unsigned_op = 1;
                 end
+
                 7'b0100000: begin // SRAIW
-                  ex_opcode = SR;
-                  imm_or_reg2 = IMM;
-                  imm = instruction[24:20];
-                  dst_reg = instruction[11:7];
-                  r1_reg = instruction[19:15];
-                  is_word_op = 1;
+                  ex_opcode = SHIFT_RIGHT;
+                  imm = {{58{1'b0}}, instruction[24:20]};
                 end
               endcase
             end
-
-            default: begin
-              dst_reg = 0;
-              ex_opcode = NOP;
-              r1_reg = 0;
-              r2_reg = 0;
-            end
-          endcase
-        end
-
-        7'b0111011: begin
-          funct3 = instruction[14:12];
-          funct7 = instruction[31:25];
-          mem_opcode = 3;
-          case(funct3)
-            3'b000: begin
-              dst_reg = instruction[11:7];
-              r1_reg = instruction[19:15];
-              r2_reg = instruction[24:20];
-              imm_or_reg2 = REG2;
-              is_word_op = 1;
-
-              case(funct7)
-                // ADDW
-                7'b0000000: begin
-                  ex_opcode = ADD;
-                end
-
-                // MULW
-                7'b0000001: begin
-                  ex_opcode = MUL;
-                end
-
-                // SUBW
-                7'b0100000: begin
-                  ex_opcode = SUB;
-                end
-
-                default: begin
-                  dst_reg = 0;
-                  ex_opcode = NOP;
-                  r1_reg = 0;
-                  r2_reg = 0;
-                end
-              endcase
-            end 
 
             default: begin
               dst_reg = 0;
@@ -265,32 +203,56 @@ module pipeline_decode
           r2_reg = instruction[24:20];
           imm_or_reg2 = REG2;
           is_word_op = 0;
+          unsigned_op = 0;
           mem_opcode = 3;
 
           case (funct7)
             7'b0000000: begin
               case (funct3)
                 3'b000: ex_opcode = ADD;  // ADD
-                3'b001: ex_opcode = SL;   // SLL
-                3'b101: ex_opcode = SR;   // SRL
+                3'b001: ex_opcode = SHIFT_LEFT;   // SLL
+                3'b010: ex_opcode = SET_LESS_THAN; // SLT
+                3'b011: begin // SLTU
+                  unsigned_op = 1;
+                  ex_opcode = SET_LESS_THAN;
+                end
+                3'b100: ex_opcode = XOR;
+                3'b101: begin
+                  ex_opcode = SHIFT_RIGHT;   // SRL
+                  unsigned_op = 1;
+                end
+                3'b110: ex_opcode = OR;
+                3'b111: ex_opcode = AND;
               endcase
             end
             7'b0100000: begin
               case (funct3)
                 3'b000: ex_opcode = SUB;  // SUB
-                3'b101: ex_opcode = SR;   // SRA
+                3'b101: ex_opcode = SHIFT_RIGHT; // SRA
               endcase
             end
             7'b0000001: begin
               case (funct3)
-                3'b000: ex_opcode = MUL;    // MUL
-                3'b001: ex_opcode = MUL;   // MULH
-                3'b010: ex_opcode = MUL; // MULHSU
-                3'b011: ex_opcode = MUL;  // MULHU
+                3'b000: ex_opcode = MUL;      // MUL
+                3'b001: ex_opcode = MULH;     // MULH
+                3'b010: begin                // MULHSU
+                  ex_opcode = MULH;
+                  unsigned_op = 2;
+                end
+                3'b011: begin                 // MULHU
+                  ex_opcode = MULH;
+                  unsigned_op = 1;
+                end
                 3'b100: ex_opcode = DIV;    // DIV
-                3'b101: ex_opcode = DIV;   // DIVU
+                3'b101: begin               // DIVU
+                  unsigned_op = 1;
+                  ex_opcode = DIV;
+                end
                 3'b110: ex_opcode = REM;    // REM
-                3'b111: ex_opcode = REM;   // REMU
+                3'b111: begin               // REMU
+                  ex_opcode = REM;
+                  unsigned_op = 1;
+                end
               endcase
             end
           endcase
@@ -305,28 +267,38 @@ module pipeline_decode
           imm_or_reg2 = REG2;
           is_word_op = 1;
           mem_opcode = 3;
+          unsigned_op = 0;
 
           case (funct7)
             7'b0000000: begin
               case (funct3)
                 3'b000: ex_opcode = ADD; // ADDW
-                3'b001: ex_opcode = SL;  // SLLW
-                3'b101: ex_opcode = SR;  // SRLW
+                3'b001: ex_opcode = SHIFT_LEFT;  // SLLW
+                3'b101: begin  // SRLW
+                  unsigned_op = 1;
+                  ex_opcode = SHIFT_RIGHT;
+                end
               endcase
             end
             7'b0100000: begin
               case (funct3)
                 3'b000: ex_opcode = SUB; // SUBW
-                3'b101: ex_opcode = SR;  // SRAW
+                3'b101: ex_opcode = SHIFT_RIGHT;  // SRAW
               endcase
             end
             7'b0000001: begin
               case (funct3)
                 3'b000: ex_opcode = MUL;   // MULW
                 3'b100: ex_opcode = DIV;   // DIVW
-                3'b101: ex_opcode = DIV;  // DIVUW
+                3'b101: begin              // DIVUW
+                  ex_opcode = DIV;
+                  unsigned_op = 1;
+                end
                 3'b110: ex_opcode = REM;   // REMW
-                3'b111: ex_opcode = REM;  // REMUW
+                3'b111: begin              // REMUW
+                  ex_opcode = REM;
+                  unsigned_op = 1;
+                end
               endcase
             end
           endcase
@@ -337,7 +309,7 @@ module pipeline_decode
           ex_opcode = LOAD_REGISTER;
           dst_reg = instruction[11:7];
           imm_or_reg2 = IMM;
-          imm = instruction[31:12];
+          imm = {{32{instruction[31]}}, instruction[31:12], {12{1'b0}}};
 
           r1_reg = 0;
           r2_reg = 0;
@@ -349,7 +321,7 @@ module pipeline_decode
           ex_opcode = PC_ADD;
           dst_reg = instruction[11:7];
           imm_or_reg2 = IMM;
-          imm = instruction[31:12];
+          imm = {{32{instruction[31]}}, instruction[31:12], {12{1'b0}}};
 
           r1_reg = 0;
           r2_reg = 0;
@@ -387,14 +359,13 @@ module pipeline_decode
           // Conditional Branches
           funct3 = instruction[14:12];
 
+          imm_or_reg2 = REG2;
           imm[12]   = instruction[31];
           imm[10:5] = instruction[30:25];
           imm[4:1]  = instruction[11:8];
           imm[11]   = instruction[7];
           imm[0]    = 1'b0;
-
           imm[63:13] = {52{instruction[31]}};
-          imm_or_reg2 = REG2;
 
           dst_reg = 0;
           r1_reg = instruction[19:15];
@@ -415,10 +386,12 @@ module pipeline_decode
               branch_type = BGE;
             end
             3'b110: begin
-              branch_type = BLTU;
+              branch_type = BLT;
+              unsigned_op = 1;
             end
             3'b111: begin
-              branch_type = BGEU;
+              branch_type = BGE;
+              unsigned_op = 1;
             end
           endcase
         end
@@ -467,8 +440,7 @@ module pipeline_decode
 
           r1_reg = instruction[19:15];
           r2_reg = instruction[24:20];
-          imm = {instruction[31:25], instruction[11:7]};
-          imm[63:12] = {52{instruction[31]}};
+          imm = {{52{instruction[31]}}, instruction[31:25], instruction[11:7]};
           imm_or_reg2 = IMM;
           is_word_op = 0;
 
@@ -493,7 +465,7 @@ module pipeline_decode
           ecall = 1;
           dst_reg = 0;
           ex_opcode = NOP;
-          mem_opcode = 0;
+          mem_opcode = 4;
           r1_reg = 0;
           r2_reg = 0;
         end
@@ -504,10 +476,62 @@ module pipeline_decode
           mem_opcode = 0;
           r1_reg = 0;
           r2_reg = 0;
-          $display("UNKNOWN INSTRUCTION at PC: %h", instruction_pc);
+          if(instruction_pc != 0) begin
+            $display("UNKNOWN INSTRUCTION at PC: %h", instruction_pc);
+            $finish();
+          end
         end
       endcase
     end
   end
 
 endmodule
+
+
+
+
+// 7'b0111011: begin
+//   funct3 = instruction[14:12];
+//   funct7 = instruction[31:25];
+//   mem_opcode = 3;
+//   case(funct3)
+//     3'b000: begin
+//       dst_reg = instruction[11:7];
+//       r1_reg = instruction[19:15];
+//       r2_reg = instruction[24:20];
+//       imm_or_reg2 = REG2;
+//       is_word_op = 1;
+
+//       case(funct7)
+//         // ADDW
+//         7'b0000000: begin
+//           ex_opcode = ADD;
+//         end
+
+//         // MULW
+//         7'b0000001: begin
+//           ex_opcode = MUL;
+//         end
+
+//         // SUBW
+//         7'b0100000: begin
+//           ex_opcode = SUB;
+//         end
+
+//         default: begin
+//           dst_reg = 0;
+//           ex_opcode = NOP;
+//           r1_reg = 0;
+//           r2_reg = 0;
+//         end
+//       endcase
+//     end 
+
+//     default: begin
+//       dst_reg = 0;
+//       ex_opcode = NOP;
+//       r1_reg = 0;
+//       r2_reg = 0;
+//     end
+//   endcase
+// end

@@ -87,10 +87,10 @@ VL_MODULE(Vtop) {
     VL_SIG8(top__DOT__next_ex_opcode,6,0);
     VL_SIG8(top__DOT__branch_type,3,0);
     VL_SIG8(top__DOT__next_branch_type,3,0);
-    VL_SIG8(top__DOT__ecall_ex,0,0);
-    VL_SIG8(top__DOT__next_ecall_ex,0,0);
     VL_SIG8(top__DOT__is_word_op,0,0);
     VL_SIG8(top__DOT__next_is_word_op,0,0);
+    VL_SIG8(top__DOT__unsigned_op,2,0);
+    VL_SIG8(top__DOT__next_unsigned_op,2,0);
     VL_SIG8(top__DOT__ex_dst_reg,4,0);
     VL_SIG8(top__DOT__next_ex_dst_reg,4,0);
     VL_SIG8(top__DOT__imm_or_reg2,0,0);
@@ -99,6 +99,8 @@ VL_MODULE(Vtop) {
     VL_SIG8(top__DOT__next_mem_opcode_ex,6,0);
     VL_SIG8(top__DOT__mem_operation_size_ex,3,0);
     VL_SIG8(top__DOT__next_mem_operation_size_ex,3,0);
+    VL_SIG8(top__DOT__ecall_ex,0,0);
+    VL_SIG8(top__DOT__next_ecall_ex,0,0);
     VL_SIG8(top__DOT__mem_dst_reg,4,0);
     VL_SIG8(top__DOT__next_mem_dst_reg,4,0);
     VL_SIG8(top__DOT__mem_opcode,6,0);
@@ -109,14 +111,14 @@ VL_MODULE(Vtop) {
     VL_SIG8(top__DOT__wb_dst_reg,4,0);
     VL_SIG8(top__DOT__wb_enable,0,0);
     VL_SIG8(top__DOT__ecall,0,0);
-    VL_SIG8(top__DOT__ecall_done,0,0);
+    VL_SIG8(top__DOT__next_ecall,0,0);
     VL_SIG8(top__DOT__rf_reg1,4,0);
     VL_SIG8(top__DOT__rf_reg2,4,0);
     VL_SIG8(top__DOT__L1_I_S_R_DATA_VALID,0,0);
     VL_SIG8(top__DOT__L1_D_S_R_ADDR_VALID,0,0);
     VL_SIG8(top__DOT__L1_D_S_R_DATA_VALID,0,0);
     VL_SIG8(top__DOT__L1_D_S_W_VALID,0,0);
-    VL_SIG8(top__DOT__L1_D_S_W_SIZE,1,0);
+    VL_SIG8(top__DOT__L1_D_S_W_SIZE,3,0);
     VL_SIG8(top__DOT__L1_D_S_W_COMPLETE,0,0);
     VL_SIG8(top__DOT__L2_S_R_ADDR_VALID_I,0,0);
     VL_SIG8(top__DOT__L2_S_R_ADDR_VALID_D,0,0);
@@ -126,6 +128,8 @@ VL_MODULE(Vtop) {
     VL_SIG8(top__DOT__L2_S_W_COMPLETE,0,0);
     VL_SIG8(top__DOT__ex_raw_dep,0,0);
     VL_SIG8(top__DOT__mem_raw_dep,0,0);
+    VL_SIG8(top__DOT__rf__DOT__ecall_state,2,0);
+    VL_SIG8(top__DOT__rf__DOT__next_ecall_state,2,0);
     VL_SIG8(top__DOT__llc__DOT__state,2,0);
     VL_SIG8(top__DOT__llc__DOT__next_state,2,0);
     VL_SIG8(top__DOT__llc__DOT__w_state,2,0);
@@ -149,6 +153,7 @@ VL_MODULE(Vtop) {
     VL_SIG8(top__DOT__llc__DOT__r2_selected_block_is_dirty,0,0);
     VL_SIG8(top__DOT__llc__DOT__r1_requested_index,5,0);
     VL_SIG8(top__DOT__llc__DOT__r2_requested_index,5,0);
+    VL_SIG8(top__DOT__llc__DOT__ac_addr_requested_index,5,0);
     VL_SIG8(top__DOT__llc__DOT__last_chosen,0,0);
     VL_SIG8(top__DOT__llc__DOT__next_last_chosen,0,0);
     VL_SIG8(top__DOT__llc__DOT__latched_s_w_contains_request,0,0);
@@ -191,22 +196,24 @@ VL_MODULE(Vtop) {
     VL_SIG8(top__DOT__l1_d__DOT__r_requested_index,5,0);
     VL_SIG8(top__DOT__l1_d__DOT__w_requested_index,5,0);
     VL_SIG8(top__DOT__l1_d__DOT__latched_w_requested_index,5,0);
+    VL_SIG8(top__DOT__l1_d__DOT__ac_addr_requested_index,5,0);
     VL_SIG8(top__DOT__l1_d__DOT__r_requested_offset,5,0);
     VL_SIG8(top__DOT__if_stage__DOT__state,1,0);
     VL_SIG8(top__DOT__if_stage__DOT__next_state,1,0);
     VL_SIG8(top__DOT__id_stage__DOT__opcode,6,0);
     VL_SIG8(top__DOT__id_stage__DOT__funct3,2,0);
     VL_SIG8(top__DOT__id_stage__DOT__funct7,6,0);
-    VL_SIG8(top__DOT__mem_stage__DOT__S_W_SIZE,1,0);
     VL_SIG8(top__DOT__mem_stage__DOT__state,2,0);
     VL_SIG8(top__DOT__mem_stage__DOT__next_state,2,0);
-    //char	__VpadToAlign238[2];
+    //char	__VpadToAlign243[1];
     VL_SIG(top__DOT__instruction,31,0);
     VL_SIG(top__DOT__next_instruction,31,0);
+    //char	__VpadToAlign252[4];
     VL_SIGW(top__DOT__L2_S_R_DATA_I,511,0,16);
     VL_SIGW(top__DOT__L2_S_R_DATA_D,511,0,16);
+    VL_SIGW(top__DOT__L2_S_W_DATA,511,0,16);
     VL_SIG(top__DOT__rf__DOT__unnamedblk1__DOT__i,31,0);
-    //char	__VpadToAlign380[4];
+    //char	__VpadToAlign452[4];
     VL_SIGW(top__DOT__llc__DOT__latched_w_data_buffer,511,0,16);
     VL_SIGW(top__DOT__llc__DOT__next_latched_w_data_buffer,511,0,16);
     VL_SIGW(top__DOT__llc__DOT__w_selected_data,511,0,16);
@@ -219,6 +226,7 @@ VL_MODULE(Vtop) {
     VL_SIGW(top__DOT__l1_d__DOT__next_latched_w_data_buffer,511,0,16);
     VL_SIGW(top__DOT__l1_d__DOT__r_selected_data,511,0,16);
     VL_SIGW(top__DOT__l1_d__DOT__w_selected_data,511,0,16);
+    VL_SIGW(top__DOT__ex_stage__DOT__multiplication_result,127,0,4);
     VL_SIG64(top__DOT__pc,63,0);
     VL_SIG64(top__DOT__next_if_pc,63,0);
     VL_SIG64(top__DOT__jump_pc,63,0);
@@ -256,6 +264,7 @@ VL_MODULE(Vtop) {
     VL_SIG64(top__DOT__llc__DOT__r2_requested_tag,51,0);
     VL_SIG64(top__DOT__llc__DOT__r1_selected_tag,51,0);
     VL_SIG64(top__DOT__llc__DOT__r2_selected_tag,51,0);
+    VL_SIG64(top__DOT__llc__DOT__ac_addr_requested_tag,51,0);
     VL_SIG64(top__DOT__llc__DOT__latched_s_w_request_addr,63,0);
     VL_SIG64(top__DOT__llc__DOT__next_latched_s_w_request_addr,63,0);
     VL_SIG64(top__DOT__l1_i__DOT__latched_r_requested_address,63,0);
@@ -268,6 +277,7 @@ VL_MODULE(Vtop) {
     VL_SIG64(top__DOT__l1_d__DOT__next_latched_r_requested_address,63,0);
     VL_SIG64(top__DOT__l1_d__DOT__latched_w_requested_address,63,0);
     VL_SIG64(top__DOT__l1_d__DOT__next_latched_w_requested_address,63,0);
+    VL_SIG64(top__DOT__l1_d__DOT__test3_signal,63,0);
     VL_SIGW(top__DOT__l1_d__DOT__cache,36223,0,1132);
     VL_SIGW(top__DOT__l1_d__DOT__next_cache,36223,0,1132);
     VL_SIG64(top__DOT__l1_d__DOT__latched_s_w_request_data,63,0);
@@ -278,53 +288,53 @@ VL_MODULE(Vtop) {
     VL_SIG64(top__DOT__l1_d__DOT__r_selected_tag,51,0);
     VL_SIG64(top__DOT__l1_d__DOT__w_selected_tag,51,0);
     VL_SIG64(top__DOT__l1_d__DOT__latched_w_requested_tag,51,0);
+    VL_SIG64(top__DOT__l1_d__DOT__ac_addr_requested_tag,51,0);
     VL_SIG64(top__DOT__ex_stage__DOT__operand2,63,0);
+    VL_SIG64(top__DOT__ex_stage__DOT__temp_result,63,0);
     VL_SIG64(top__DOT__rf__DOT__registers[32],63,0);
     
     // LOCAL VARIABLES
     // Internals; generally not touched by application code
-    VL_SIG8(top__DOT__llc__DOT____Vlvbound3,1,0);
+    VL_SIG8(top__DOT__llc__DOT____Vlvbound1,0,0);
     VL_SIG8(top__DOT__llc__DOT____Vlvbound4,1,0);
-    VL_SIG8(top__DOT__llc__DOT____Vlvbound6,1,0);
+    VL_SIG8(top__DOT__llc__DOT____Vlvbound5,1,0);
+    VL_SIG8(top__DOT__llc__DOT____Vlvbound7,1,0);
     VL_SIG8(top__DOT__l1_i__DOT____Vlvbound2,0,0);
-    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound1,1,0);
-    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound2,7,0);
-    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound6,1,0);
-    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound7,7,0);
-    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound11,1,0);
-    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound12,7,0);
-    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound17,1,0);
+    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound1,0,0);
+    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound2,1,0);
+    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound3,7,0);
+    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound7,1,0);
+    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound8,7,0);
+    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound12,1,0);
+    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound13,7,0);
+    VL_SIG8(top__DOT__l1_d__DOT____Vlvbound18,1,0);
     VL_SIG8(__Vclklast__TOP__clk,0,0);
-    VL_SIG16(top__DOT__l1_d__DOT____Vlvbound3,15,0);
-    VL_SIG16(top__DOT__l1_d__DOT____Vlvbound8,15,0);
-    VL_SIG16(top__DOT__l1_d__DOT____Vlvbound13,15,0);
-    //char	__VpadToAlign29510[2];
+    VL_SIG16(top__DOT__l1_d__DOT____Vlvbound4,15,0);
+    VL_SIG16(top__DOT__l1_d__DOT____Vlvbound9,15,0);
+    VL_SIG16(top__DOT__l1_d__DOT____Vlvbound14,15,0);
     VL_SIG(top__DOT____Vcellout__l1_i__S_R_DATA,31,0);
-    //char	__VpadToAlign29516[4];
-    VL_SIGW(top__DOT____Vcellout__l1_d__L2_S_W_DATA,511,0,16);
     VL_SIG(top__DOT____Vcellinp__ex_stage__mem_opcode,31,0);
-    //char	__VpadToAlign29588[4];
-    VL_SIGW(top__DOT__llc__DOT____Vlvbound1,511,0,16);
+    VL_SIGW(top__DOT__llc__DOT____Vlvbound2,511,0,16);
     VL_SIGW(top__DOT__l1_i__DOT____Vlvbound1,511,0,16);
-    VL_SIG(top__DOT__l1_d__DOT____Vlvbound4,31,0);
-    VL_SIG(top__DOT__l1_d__DOT____Vlvbound9,31,0);
-    VL_SIG(top__DOT__l1_d__DOT____Vlvbound14,31,0);
-    //char	__VpadToAlign29732[4];
-    VL_SIGW(top__DOT__l1_d__DOT____Vlvbound16,511,0,16);
+    VL_SIG(top__DOT__l1_d__DOT____Vlvbound5,31,0);
+    VL_SIG(top__DOT__l1_d__DOT____Vlvbound10,31,0);
+    VL_SIG(top__DOT__l1_d__DOT____Vlvbound15,31,0);
+    //char	__VpadToAlign29780[4];
+    VL_SIGW(top__DOT__l1_d__DOT____Vlvbound17,511,0,16);
     VL_SIG(__Vm_traceActivity,31,0);
-    //char	__VpadToAlign29804[4];
-    VL_SIG64(top__DOT__llc__DOT____Vlvbound2,51,0);
-    VL_SIG64(top__DOT__llc__DOT____Vlvbound5,63,0);
-    VL_SIG64(top__DOT__llc__DOT____Vlvbound7,51,0);
+    //char	__VpadToAlign29852[4];
+    VL_SIG64(top__DOT__llc__DOT____Vlvbound3,51,0);
+    VL_SIG64(top__DOT__llc__DOT____Vlvbound6,63,0);
+    VL_SIG64(top__DOT__llc__DOT____Vlvbound8,51,0);
     VL_SIG64(top__DOT__l1_i__DOT____Vlvbound3,51,0);
-    VL_SIG64(top__DOT__l1_d__DOT____Vlvbound5,63,0);
-    VL_SIG64(top__DOT__l1_d__DOT____Vlvbound10,63,0);
-    VL_SIG64(top__DOT__l1_d__DOT____Vlvbound15,63,0);
-    VL_SIG64(top__DOT__l1_d__DOT____Vlvbound18,51,0);
+    VL_SIG64(top__DOT__l1_d__DOT____Vlvbound6,63,0);
+    VL_SIG64(top__DOT__l1_d__DOT____Vlvbound11,63,0);
+    VL_SIG64(top__DOT__l1_d__DOT____Vlvbound16,63,0);
+    VL_SIG64(top__DOT__l1_d__DOT____Vlvbound19,51,0);
     
     // INTERNAL VARIABLES
     // Internals; generally not touched by application code
-    //char	__VpadToAlign29876[4];
+    //char	__VpadToAlign29924[4];
     Vtop__Syms*	__VlSymsp;		// Symbol table
     
     // PARAMETERS
@@ -361,6 +371,8 @@ VL_MODULE(Vtop) {
     static QData	_change_request(Vtop__Syms* __restrict vlSymsp);
   public:
     static void	_combo__TOP__3(Vtop__Syms* __restrict vlSymsp);
+    static void	_combo__TOP__7(Vtop__Syms* __restrict vlSymsp);
+    static void	_combo__TOP__9(Vtop__Syms* __restrict vlSymsp);
   private:
     void	_configure_coverage(Vtop__Syms* __restrict vlSymsp, bool first);
     void	_ctor_var_reset();
@@ -371,8 +383,7 @@ VL_MODULE(Vtop) {
     static void	_initial__TOP__1(Vtop__Syms* __restrict vlSymsp);
     static void	_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp);
     static void	_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp);
-    static void	_sequent__TOP__7(Vtop__Syms* __restrict vlSymsp);
-    static void	_sequent__TOP__9(Vtop__Syms* __restrict vlSymsp);
+    static void	_settle__TOP__10(Vtop__Syms* __restrict vlSymsp);
     static void	_settle__TOP__4(Vtop__Syms* __restrict vlSymsp);
     static void	_settle__TOP__6(Vtop__Syms* __restrict vlSymsp);
     static void	_settle__TOP__8(Vtop__Syms* __restrict vlSymsp);

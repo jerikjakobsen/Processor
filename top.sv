@@ -79,15 +79,16 @@ module top
   logic [ADDR_WIDTH-1:0] ex_instr_pc, next_ex_instr_pc;
   logic [6:0] ex_opcode, next_ex_opcode;
   logic [3:0] branch_type, next_branch_type;
-  logic ecall_ex, next_ecall_ex;
   logic [DATA_WIDTH-1:0] r1_val, next_r1_val;
   logic [DATA_WIDTH-1:0] r2_val, next_r2_val;
   logic signed [DATA_WIDTH-1:0] imm, next_imm;
   logic is_word_op, next_is_word_op;
+  logic [2:0] unsigned_op, next_unsigned_op;
   logic [4:0] ex_dst_reg, next_ex_dst_reg;
   logic imm_or_reg2, next_imm_or_reg2;
   logic [6:0] mem_opcode_ex, next_mem_opcode_ex;
   logic [3:0] mem_operation_size_ex, next_mem_operation_size_ex;  
+  logic ecall_ex, next_ecall_ex;
 
   // EX -> MEM
   logic signed [DATA_WIDTH-1:0] ex_res, next_ex_res; // signed
@@ -101,7 +102,7 @@ module top
   logic [4:0] wb_dst_reg;
   logic [DATA_WIDTH-1:0] wb_dst_val;
   logic wb_enable;
-  logic ecall, ecall_done;
+  logic ecall, next_ecall, ecall_done;
 
   // REGISTER FILE SIGNALS
   logic [4:0] rf_reg1;
@@ -122,7 +123,7 @@ module top
   logic L1_D_S_W_VALID;
   logic [ADDR_WIDTH-1:0] L1_D_S_W_ADDR;
   logic [DATA_WIDTH-1:0] L1_D_S_W_DATA;
-  logic [1:0] L1_D_S_W_SIZE;
+  logic [3:0] L1_D_S_W_SIZE;
   logic L1_D_S_W_READY;
   logic L1_D_S_W_COMPLETE;
   
@@ -134,15 +135,22 @@ module top
 
   logic L2_S_W_VALID;
   logic [ADDR_WIDTH-1:0] L2_S_W_ADDR;
-  logic [DATA_WIDTH-1:0] L2_S_W_DATA;
+  logic [511:0] L2_S_W_DATA;
   logic L2_S_W_READY;
   logic L2_S_W_COMPLETE;
 
   logic ex_raw_dep, mem_raw_dep;
 
+  logic tmp_signal;
+
+  assign tmp_signal = pc == 63'h1e74c;
+
   assign m_axi_arburst = 2'b10;
+  assign m_axi_awburst = 2'b01;
   assign m_axi_arsize = 3'b011;
-  assign m_axi_arlen = 8'd7;
+  assign m_axi_awsize = 3'b011;
+  assign m_axi_arlen =  8'd7;
+  assign m_axi_awlen =  8'd7;
 
   register_file rf(
     .clk(clk),
@@ -194,7 +202,9 @@ module top
     .m_axi_wvalid(m_axi_wvalid),
     .m_axi_wready(m_axi_wready),
     .m_axi_bvalid(m_axi_bvalid),
-    .m_axi_bready(m_axi_bready)
+    .m_axi_bready(m_axi_bready),
+    .m_axi_acsnoop(m_axi_acsnoop),
+    .m_axi_acaddr(m_axi_acaddr)
   );
 
   L1_I l1_i(
@@ -207,7 +217,9 @@ module top
     .L2_S_R_ADDR(L2_S_R_ADDR_I),
     .L2_S_R_ADDR_VALID(L2_S_R_ADDR_VALID_I),
     .L2_S_R_DATA(L2_S_R_DATA_I),
-    .L2_S_R_DATA_VALID(L2_S_R_DATA_VALID_I)
+    .L2_S_R_DATA_VALID(L2_S_R_DATA_VALID_I),
+    .m_axi_acsnoop(m_axi_acsnoop),
+    .m_axi_acaddr(m_axi_acaddr)
   );
 
   L1_D l1_d(
@@ -235,7 +247,9 @@ module top
     .L2_S_W_ADDR(L2_S_W_ADDR),
     .L2_S_W_DATA(L2_S_W_DATA),
     .L2_S_W_READY(L2_S_W_READY),
-    .L2_S_W_COMPLETE(L2_S_W_COMPLETE)
+    .L2_S_W_COMPLETE(L2_S_W_COMPLETE),
+    .m_axi_acsnoop(m_axi_acsnoop),
+    .m_axi_acaddr(m_axi_acaddr)
   );
 
   pipeline_fetch if_stage(
@@ -267,6 +281,7 @@ module top
     .r2_reg(rf_reg2),
     .imm(next_imm),
     .is_word_op(next_is_word_op),
+    .unsigned_op(next_unsigned_op),
     .dst_reg(next_ex_dst_reg),
     .imm_or_reg2(next_imm_or_reg2),
     .mem_opcode(next_mem_opcode_ex),
@@ -282,22 +297,23 @@ module top
     .jump_signal(jump_signal),
     .opcode(ex_opcode),
     .branch_type(branch_type),
-    .ecall(ecall_ex),
     .instruction_pc(ex_instr_pc),
     .r1_val(r1_val),
     .r2_val(r2_val),
     .imm(imm),
     .is_word_op(is_word_op),
+    .unsigned_op(unsigned_op),
     .dst_reg(ex_dst_reg),
     .imm_or_reg2(imm_or_reg2),
     .mem_opcode(mem_opcode_ex),
-    .ecall_mem(next_ecall_mem),
     .mem_operation_size(mem_operation_size_ex),
     .ex_res(next_ex_res),
     .r2_val_mem(next_r2_val_mem),
     .mem_dst_reg(next_mem_dst_reg),
     .next_mem_opcode(next_mem_opcode),
-    .next_mem_operation_size(next_mem_operation_size)
+    .next_mem_operation_size(next_mem_operation_size),
+    .ecall(ecall_ex),
+    .ecall_mem(next_ecall_mem)
   );
 
   pipeline_memory mem_stage(
@@ -312,8 +328,6 @@ module top
     .wb_dst_reg(wb_dst_reg),
     .wb_dst_val(wb_dst_val),
     .wb_enable(wb_enable),
-    .ecall(ecall_mem),
-    .ecall_wb(ecall),
 
     .S_R_ADDR(L1_D_S_R_ADDR),
     .S_R_ADDR_VALID(L1_D_S_R_ADDR_VALID),
@@ -322,9 +336,13 @@ module top
 
     .S_W_VALID(L1_D_S_W_VALID),
     .S_W_ADDR(L1_D_S_W_ADDR),
+    .S_W_SIZE(L1_D_S_W_SIZE),
     .S_W_DATA(L1_D_S_W_DATA),
     .S_W_READY(L1_D_S_W_READY),
-    .S_W_COMPLETE(L1_D_S_W_COMPLETE)
+    .S_W_COMPLETE(L1_D_S_W_COMPLETE),
+
+    .ecall(ecall_mem),
+    .ecall_wb(next_ecall)
   );
 
   
@@ -334,9 +352,9 @@ module top
   always_ff @ (posedge clk) begin
     if (reset) begin
       pc <= entry;
-    end else if(ecall && !ecall_done) begin
-      // Wait for ecall done
     end else begin
+      ecall <= next_ecall_ex ? next_ecall : 0;
+
       if(mem_ready) begin
           ex_res <= next_ex_res;
           r2_val_mem <= next_r2_val_mem;
@@ -344,7 +362,7 @@ module top
           mem_opcode <= next_mem_opcode;
           mem_operation_size <= next_mem_operation_size;
           jump_signal_applied <= 0;
-          ecall_mem <= next_ecall_mem;
+          ecall_mem <= next_ecall_ex ? next_ecall_mem : 0;
       end
 
       if(ex_ready) begin
@@ -358,6 +376,7 @@ module top
           ex_dst_reg <= 0;
           imm_or_reg2 <= 0;
           is_word_op <= 0;
+          unsigned_op <= 0;
           mem_opcode_ex <= 0;
           mem_operation_size_ex <= 0;
           ecall_ex <= 0;
@@ -373,6 +392,7 @@ module top
             ex_dst_reg <= 0;
             imm_or_reg2 <= 0;
             is_word_op <= 0;
+            unsigned_op <= 0;
             mem_opcode_ex <= 0;
             mem_operation_size_ex <= 0;
             ecall_ex <= 0;
@@ -387,6 +407,7 @@ module top
             ex_dst_reg <= 0;
             imm_or_reg2 <= 0;
             is_word_op <= 0;
+            unsigned_op <= 0;
             mem_opcode_ex <= 0;
             mem_operation_size_ex <= 0;
             ecall_ex <= 0;
@@ -398,6 +419,7 @@ module top
             ex_dst_reg <= next_ex_dst_reg;
             imm_or_reg2 <= next_imm_or_reg2;
             is_word_op <= next_is_word_op;
+            unsigned_op <= next_unsigned_op;
             mem_opcode_ex <= next_mem_opcode_ex;
             mem_operation_size_ex <= next_mem_operation_size_ex;
             ecall_ex <= next_ecall_ex;
@@ -433,7 +455,9 @@ module top
       // end
 
       // Option 2
-      if(!ex_raw_dep && !mem_raw_dep) begin
+      if(next_ecall_ex && !ecall_done) begin
+        // WAIT FOR ECALL
+      end else if(!ex_raw_dep && !mem_raw_dep) begin
         if(id_ready) begin
           if(jump_signal && !jump_signal_applied) begin
             pc <= jump_pc;
