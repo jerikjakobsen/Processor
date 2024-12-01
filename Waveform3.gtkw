@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.66 (w)1999-2015 BSI
-[*] Sun Dec  1 05:48:29 2024
+[*] Sun Dec  1 10:10:28 2024
 [*]
 [dumpfile] "/home/kuchadha/cse_502_cpu/trace.vcd"
-[dumpfile_mtime] "Sun Dec  1 05:41:10 2024"
-[dumpfile_size] 4060276
+[dumpfile_mtime] "Sun Dec  1 10:04:45 2024"
+[dumpfile_size] 468076842
 [savefile] "/home/kuchadha/cse_502_cpu/Waveform3.gtkw"
-[timestart] 172893
+[timestart] 14922787
 [size] 1512 865
 [pos] -1 -1
-*-9.000000 173500 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-9.000000 14924000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.top.
 [sst_width] 210
@@ -91,6 +91,11 @@ TOP.top.pc[63:0]
 (63)TOP.top.pc[63:0]
 @1401200
 -group_end
+@28
+TOP.top.tmp_signal
+@22
+TOP.top.m_axi_acaddr[63:0]
+TOP.top.m_axi_acsnoop[3:0]
 @200
 -
 -IF
@@ -102,16 +107,30 @@ TOP.top.if_stage.instruction[31:0]
 @200
 -
 -ID
-@24
+@22
 [color] 2
 TOP.top.id_stage.instruction_pc[63:0]
-@22
 [color] 2
 TOP.top.id_stage.instruction[31:0]
 [color] 2
 TOP.top.id_stage.r1_reg[4:0]
+@c00022
 [color] 2
 TOP.top.id_stage.r2_reg[4:0]
+@28
+[color] 2
+(0)TOP.top.id_stage.r2_reg[4:0]
+[color] 2
+(1)TOP.top.id_stage.r2_reg[4:0]
+[color] 2
+(2)TOP.top.id_stage.r2_reg[4:0]
+[color] 2
+(3)TOP.top.id_stage.r2_reg[4:0]
+[color] 2
+(4)TOP.top.id_stage.r2_reg[4:0]
+@1401200
+-group_end
+@22
 [color] 2
 TOP.top.id_stage.dst_reg[4:0]
 [color] 2
@@ -130,7 +149,7 @@ TOP.top.id_stage.ecall
 @200
 -
 -EX
-@24
+@22
 [color] 7
 TOP.top.ex_stage.instruction_pc[63:0]
 @c00024
@@ -154,8 +173,15 @@ TOP.top.ex_stage.opcode[6:0]
 @1401200
 -group_end
 @22
+TOP.top.ex_stage.r1_val[63:0]
+TOP.top.ex_stage.r2_val[63:0]
+@28
+TOP.top.ex_stage.imm_or_reg2
+@22
 TOP.top.ex_stage.branch_type[3:0]
+@24
 TOP.top.ex_stage.imm[63:0]
+@22
 TOP.top.ex_stage.ex_res[63:0]
 @28
 TOP.top.ex_stage.jump_signal
@@ -181,10 +207,17 @@ TOP.top.mem_stage.S_W_ADDR[63:0]
 TOP.top.mem_stage.S_W_DATA[63:0]
 @28
 TOP.top.mem_stage.S_W_VALID
+TOP.top.mem_stage.tmp_signal
 @200
 -
 -REG
 @22
+TOP.top.rf.registers(1)[63:0]
+TOP.top.rf.registers(2)[63:0]
+@23
+TOP.top.rf.registers(6)[63:0]
+@22
+TOP.top.rf.registers(10)[63:0]
 TOP.top.rf.registers(11)[63:0]
 TOP.top.rf.registers(12)[63:0]
 TOP.top.rf.registers(13)[63:0]
@@ -195,14 +228,27 @@ TOP.top.rf.registers(16)[63:0]
 -
 -
 -L1-D
+@28
+TOP.top.l1_d.tmp_signal
+@22
+TOP.top.l1_d.S_R_ADDR[63:0]
+@28
+TOP.top.l1_d.S_R_ADDR_VALID
+@22
+TOP.top.l1_d.S_R_DATA[63:0]
+@28
+TOP.top.l1_d.S_R_DATA_VALID
 @22
 TOP.top.l1_d.S_W_ADDR[63:0]
 TOP.top.l1_d.S_W_DATA[63:0]
 @28
+TOP.top.l1_d.S_W_VALID
 TOP.top.l1_d.S_W_COMPLETE
 @24
 TOP.top.l1_d.state[2:0]
 TOP.top.l1_d.w_state[2:0]
+@28
+TOP.top.l1_d.L2_S_W_VALID
 @22
 TOP.top.l1_d.L2_S_R_ADDR[63:0]
 @28
@@ -728,15 +774,46 @@ TOP.top.l1_d.L2_S_W_DATA[511:0]
 (511)TOP.top.l1_d.L2_S_W_DATA[511:0]
 @1401200
 -group_end
-@29
+@28
 TOP.top.l1_d.L2_S_W_COMPLETE
 @24
 TOP.top.l1_d.test_signal[63:0]
 TOP.top.l1_d.test2_signal[63:0]
+@22
 TOP.top.l1_d.test3_signal[63:0]
 @200
 -
 -
 -LLC
+@22
+TOP.top.llc.S2_R_ADDR[63:0]
+@28
+TOP.top.llc.S2_R_ADDR_VALID
+TOP.top.llc.S2_R_DATA_VALID
+@22
+TOP.top.llc.S_W_ADDR[63:0]
+TOP.top.llc.S_W_DATA[511:0]
+@28
+TOP.top.llc.S_W_VALID
+TOP.top.llc.S_W_COMPLETE
+@24
+TOP.top.llc.state[2:0]
+TOP.top.llc.r_state[2:0]
+TOP.top.llc.w_state[2:0]
+@28
+TOP.top.llc.m_axi_arvalid
+@22
+TOP.top.llc.m_axi_araddr[63:0]
+TOP.top.llc.m_axi_awaddr[63:0]
+@28
+TOP.top.llc.m_axi_awvalid
+@22
+TOP.top.llc.m_axi_wdata[63:0]
+@28
+TOP.top.llc.line1_active
+TOP.top.llc.line2_active
+@200
+-
+-
 [pattern_trace] 1
 [pattern_trace] 0
