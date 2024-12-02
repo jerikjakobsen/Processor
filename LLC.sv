@@ -207,50 +207,50 @@ always_comb begin
     case (state)
         IDLE: begin
             S_W_COMPLETE = 0;
-            if(m_axi_acsnoop && cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
-							next_cache[ac_addr_requested_index].state[1] = 0;
-						end else begin
-							if (line1_active && !service_line) begin // Handle line 1 (READ ONLY) Will Only come here if line1 address is a miss
-									next_latched_r_requested_address = {r1_requested_tag, r1_requested_index, {OFFSET_SIZE{1'b0}}};
-									next_r_state = AXI_R_REQUEST;
-									next_last_chosen = 0;
-									if (r1_selected_tag != r1_requested_tag && r1_selected_block_is_dirty && r1_selected_block_is_valid) begin // Must overwrite with read in data
-											next_state = W_R_REQUEST;
-											next_latched_w_data_buffer = cache[r1_requested_index].data;
-											next_latched_w_requested_address = {r1_selected_tag, r1_requested_index, {OFFSET_SIZE{1'b0}}};
-											next_w_state = AXI_W_REQUEST;
-									end else begin
-											next_state = R_REQUEST;
-									end
-							end else if (line2_active && service_line) begin // Handle line 2 (READ/WRITE) (Will prioritize Read but this shouldnt make a difference)
-									next_last_chosen = 1; 
-									if (S2_R_ADDR_VALID && (r2_requested_tag != r2_selected_tag || !r2_selected_block_is_valid)) begin
-											next_latched_r_requested_address = {r2_requested_tag, r2_requested_index, {OFFSET_SIZE{1'b0}}};
-											next_r_state = AXI_R_REQUEST;
-											if (r2_selected_block_is_dirty && r2_selected_block_is_valid) begin // Must evict
-													next_state = W_R_REQUEST;
-													next_latched_w_data_buffer = cache[r2_requested_index].data;
-													next_latched_w_requested_address = {r2_selected_tag, r2_requested_index, {OFFSET_SIZE{1'b0}}};
-													next_w_state = AXI_W_REQUEST;
-											end else begin
-													next_state = R_REQUEST;
-											end
-									end else if (latched_s_w_contains_request) begin
-											next_cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].data = latched_s_w_request_data;
-											next_cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].tag = latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE];
-											next_cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].state = 2'b11;
-											if (cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].tag != latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE] && cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].state[1] && cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].state[0]) begin // Must evict and overwrite
-													next_state = W_REQUEST;
-													next_latched_w_data_buffer = cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].data;
-													next_latched_w_requested_address = {cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].tag, latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE], {OFFSET_SIZE{1'b0}}};
-													next_w_state = AXI_W_REQUEST;
-											end else begin // Can just overwrite
-													next_state = W_DONE;
-													next_latched_w_requested_address = latched_s_w_request_addr;
-											end
-									end
-							end
-						end
+            if(m_axi_acsnoop == 63'hD && cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
+                next_cache[ac_addr_requested_index].state[1] = 0;
+            end else begin
+                if (line1_active && !service_line) begin // Handle line 1 (READ ONLY) Will Only come here if line1 address is a miss
+                        next_latched_r_requested_address = {r1_requested_tag, r1_requested_index, {OFFSET_SIZE{1'b0}}};
+                        next_r_state = AXI_R_REQUEST;
+                        next_last_chosen = 0;
+                        if (r1_selected_tag != r1_requested_tag && r1_selected_block_is_dirty && r1_selected_block_is_valid) begin // Must overwrite with read in data
+                                next_state = W_R_REQUEST;
+                                next_latched_w_data_buffer = cache[r1_requested_index].data;
+                                next_latched_w_requested_address = {r1_selected_tag, r1_requested_index, {OFFSET_SIZE{1'b0}}};
+                                next_w_state = AXI_W_REQUEST;
+                        end else begin
+                                next_state = R_REQUEST;
+                        end
+                end else if (line2_active && service_line) begin // Handle line 2 (READ/WRITE) (Will prioritize Read but this shouldnt make a difference)
+                        next_last_chosen = 1; 
+                        if (S2_R_ADDR_VALID && (r2_requested_tag != r2_selected_tag || !r2_selected_block_is_valid)) begin
+                                next_latched_r_requested_address = {r2_requested_tag, r2_requested_index, {OFFSET_SIZE{1'b0}}};
+                                next_r_state = AXI_R_REQUEST;
+                                if (r2_selected_block_is_dirty && r2_selected_block_is_valid) begin // Must evict
+                                        next_state = W_R_REQUEST;
+                                        next_latched_w_data_buffer = cache[r2_requested_index].data;
+                                        next_latched_w_requested_address = {r2_selected_tag, r2_requested_index, {OFFSET_SIZE{1'b0}}};
+                                        next_w_state = AXI_W_REQUEST;
+                                end else begin
+                                        next_state = R_REQUEST;
+                                end
+                        end else if (latched_s_w_contains_request) begin
+                                next_cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].data = latched_s_w_request_data;
+                                next_cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].tag = latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE];
+                                next_cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].state = 2'b11;
+                                if (cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].tag != latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE] && cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].state[1] && cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].state[0]) begin // Must evict and overwrite
+                                        next_state = W_REQUEST;
+                                        next_latched_w_data_buffer = cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].data;
+                                        next_latched_w_requested_address = {cache[latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]].tag, latched_s_w_request_addr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE], {OFFSET_SIZE{1'b0}}};
+                                        next_w_state = AXI_W_REQUEST;
+                                end else begin // Can just overwrite
+                                        next_state = W_DONE;
+                                        next_latched_w_requested_address = latched_s_w_request_addr;
+                                end
+                        end
+                end
+            end
         end
         W_R_REQUEST: begin // Read miss and overwriting dirty data (must save dirty data at same time)
             // At this point latched_w_data_buffer, latched_w_requested_address, latched_r_requested_address should contain valid data
@@ -282,7 +282,7 @@ always_comb begin
             next_r_buffer_index = 0;
         end
         AXI_R_REQUEST: begin
-            m_axi_araddr = latched_r_requested_address; // TODO: Should this be aligned to the beginning of a block?
+            m_axi_araddr = {latched_r_requested_address[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE], latched_r_requested_address[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE], {OFFSET_SIZE{1'b0}}}; // latched_r_requested_address; // TODO: Should this be aligned to the beginning of a block?
             m_axi_arvalid = 1;
 
             next_cache[latched_r_requested_index].state = 2'b00;

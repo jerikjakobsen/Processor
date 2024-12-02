@@ -2,6 +2,7 @@
 
 PROG=/shared/cse502/tests/project/prog1
 # PROG=/shared/cse502/tests/wp1/prog1.o
+# PROG=/shared/cse502/tests/wp1/prog1.o
 #PROG=/shared/cse502/tests/bbl.bin
 
 TRACE?=--trace

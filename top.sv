@@ -143,7 +143,7 @@ module top
 
   logic tmp_signal;
 
-  assign tmp_signal = pc == 63'h1e74c;
+  assign tmp_signal = pc == 63'h22f40; // 63'h22fac;// 63'h22f9c; // 63'h22f40; // 63'h1e730;
 
   assign m_axi_arburst = 2'b10;
   assign m_axi_awburst = 2'b01;

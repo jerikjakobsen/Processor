@@ -45,9 +45,10 @@ module pipeline_memory
             UNSIGNED_BYTE  = 3'd6;
 
   logic [2:0] state, next_state;
-  logic tmp_signal;
+  logic tmp_signal, tmp2_signal;
 
   assign tmp_signal = S_R_ADDR == 63'h841A0;
+  assign tmp2_signal = S_W_DATA == 63'h28;
 
   always_ff  @ (posedge clk) begin
     if(reset) begin

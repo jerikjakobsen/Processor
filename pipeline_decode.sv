@@ -77,6 +77,9 @@ module pipeline_decode
 
   always_comb begin
     ecall = 0;
+    dst_reg = 0;
+    mem_opcode = 0;
+    
     if(instruction == 90) begin
       // NOP
       ex_opcode = 0;
@@ -477,7 +480,7 @@ module pipeline_decode
           r1_reg = 0;
           r2_reg = 0;
           if(instruction_pc != 0) begin
-            $display("UNKNOWN INSTRUCTION at PC: %h", instruction_pc);
+            $display("UNKNOWN INSTRUCTION at PC: %h: %h", instruction_pc, instruction);
             $finish();
           end
         end
