@@ -1481,7 +1481,7 @@ void Vtop::traceChgThis__7(Vtop__Syms* __restrict vlSymsp, VerilatedVcd* vcdp, u
 	vcdp->chgBus  (c+7398,(vlTOPp->top__DOT__if_stage__DOT__state),2);
 	vcdp->chgBus  (c+7399,(vlTOPp->top__DOT__mem_opcode_ex),32);
 	vcdp->chgBus  (c+7400,((7U & (IData)(vlTOPp->top__DOT__mem_operation_size_ex))),3);
-	vcdp->chgBit  (c+7401,((VL_ULL(0x10920) == vlTOPp->top__DOT__ex_instr_pc)));
+	vcdp->chgBit  (c+7401,((VL_ULL(0x22f9c) == vlTOPp->top__DOT__ex_instr_pc)));
 	vcdp->chgBus  (c+7402,(vlTOPp->top__DOT__mem_stage__DOT__state),3);
     }
 }
@@ -1537,5 +1537,6 @@ void Vtop::traceChgThis__8(Vtop__Syms* __restrict vlSymsp, VerilatedVcd* vcdp, u
 	vcdp->chgBit  (c+7452,(vlTOPp->m_axi_acready));
 	vcdp->chgQuad (c+7453,(vlTOPp->m_axi_acaddr),64);
 	vcdp->chgBus  (c+7455,(vlTOPp->m_axi_acsnoop),4);
+	vcdp->chgBus  (c+7456,(vlTOPp->m_axi_acvalid),4);
     }
 }

@@ -77,13 +77,13 @@ module pipeline_fetch
       //     instruction = 32'h04d53023;
       //   end
       //   12: begin
-      //     instruction = 32'h04053703;
+      //     instruction = 32'h04050703; // 32'h04053703;
       //   end
       //   16: begin
-      //     instruction = 32'h0404b783;
+      //     instruction = 32'h04049783; // 32'h0404b783;
       //   end
       //   20: begin
-      //     instruction = 32'h04043803;
+      //     instruction = 32'h04042803; // 32'h04043803;
       //   end
       //   default: begin
       //     instruction = 90;

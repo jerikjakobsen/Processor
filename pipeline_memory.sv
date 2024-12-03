@@ -56,6 +56,35 @@ module pipeline_memory
     end else begin
       state <= next_state;
     end
+
+    if(state == WRITE_REQUEST && S_W_COMPLETE) begin
+      do_pending_write(S_W_ADDR, S_W_DATA, 2**(S_W_SIZE[1:0]));
+
+      
+      // case(mem_operation_size)
+      //   BYTE: begin
+      //     do_pending_write(ex_res, r2_val, 1);
+      //   end
+      //   HALF_WORD: begin
+      //     do_pending_write(ex_res, r2_val, 2);
+      //   end
+      //   WORD: begin
+      //     do_pending_write(ex_res, r2_val, 4);
+      //   end
+      //   DOUBLE_WORD: begin
+      //     do_pending_write(ex_res, r2_val, 8);
+      //   end
+      //   UNSIGNED_WORD: begin
+      //     do_pending_write(ex_res, r2_val, 4);
+      //   end
+      //   UNSIGNED_HALF_WORD: begin
+      //     do_pending_write(ex_res, r2_val, 2);
+      //   end
+      //   UNSIGNED_BYTE: begin
+      //     do_pending_write(ex_res, r2_val, 1);
+      //   end
+      // endcase
+    end
   end
 
   always_comb begin

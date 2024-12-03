@@ -41,7 +41,8 @@ module L1_D #(
     input wire L2_S_W_READY,
     input wire L2_S_W_COMPLETE,
     input wire [63:0] m_axi_acaddr,
-    input wire [3:0] m_axi_acsnoop
+    input wire [3:0] m_axi_acsnoop,
+    input wire [3:0] m_axi_acvalid
 );
 
     `define ADDRESS_OFFSET_SLICE (OFFSET_SIZE-1):0
@@ -109,7 +110,7 @@ module L1_D #(
 
     logic [TAG_SIZE-1:0] r_requested_tag, r_selected_tag, latched_r_requested_tag, w_selected_tag, w_requested_tag, latched_w_requested_tag, latched_w_selected_tag, ac_addr_requested_tag;
     logic [INDEX_SIZE-1:0] r_requested_index, latched_r_requested_index, w_requested_index, latched_w_requested_index, ac_addr_requested_index;
-    logic [OFFSET_SIZE-1:0] r_requested_offset;
+    logic [`ADDRESS_OFFSET_SLICE] r_requested_offset;
 
     assign test_signal = latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]; // cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].data[latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]*8 + 63-:64]; //            latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE] + 63-:64
     assign test2_signal = latched_s_w_request_addr[`ADDRESS_OFFSET_SLICE]; // cache[58].data[56*8 + 63-:64]; // cache[57].data[24 + 63-:64];
@@ -118,27 +119,27 @@ module L1_D #(
 
     always_comb begin // Convenience signals
       // Read Signals
-      r_requested_tag = S_R_ADDR[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE]; // Combinatorial access to requested address for read
-      r_requested_index = S_R_ADDR[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]; // Combinatorial access to requested address for read
-      r_requested_offset = S_R_ADDR[OFFSET_SIZE-1:0];
+      r_requested_tag = S_R_ADDR[`ADDRESS_TAG_SLICE]; // Combinatorial access to requested address for read
+      r_requested_index = S_R_ADDR[`ADDRESS_INDEX_SLICE]; // Combinatorial access to requested address for read
+      r_requested_offset = S_R_ADDR[`ADDRESS_OFFSET_SLICE];
 
       r_selected_data = cache[r_requested_index].data; // Combinatorial access to cache values based on requested address for read
       r_selected_block_is_valid = cache[r_requested_index].state[1]; // Combinatorial access to cache values based on requested address for read
       r_selected_block_is_dirty = cache[r_requested_index].state[0];
       r_selected_tag = cache[r_requested_index].tag; // Combinatorial access to cache values based on requested address for read
 
-      latched_r_requested_tag = latched_r_requested_address[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE]; // Combinatorial access to latched address for read
-      latched_r_requested_index = latched_r_requested_address[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE]; // Combinatorial access to latched address for read
+      latched_r_requested_tag = latched_r_requested_address[`ADDRESS_TAG_SLICE]; // Combinatorial access to latched address for read
+      latched_r_requested_index = latched_r_requested_address[`ADDRESS_INDEX_SLICE]; // Combinatorial access to latched address for read
 
-			ac_addr_requested_tag = m_axi_acaddr[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE];
-			ac_addr_requested_index = m_axi_acaddr[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE];
+			ac_addr_requested_tag = m_axi_acaddr[`ADDRESS_TAG_SLICE];
+			ac_addr_requested_index = m_axi_acaddr[`ADDRESS_INDEX_SLICE];
 
       S_R_DATA = r_selected_data[(r_requested_offset + 8)*8-1 -:64]; // r_selected_data[(r_requested_offset + 8)*8-1 -:64];
       S_R_DATA_VALID = S_R_ADDR_VALID && (r_selected_tag == r_requested_tag && r_selected_block_is_valid);
 
       // Write Signals
-      w_requested_tag = S_W_ADDR[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE];
-      w_requested_index = S_W_ADDR[OFFSET_SIZE+INDEX_SIZE-1:OFFSET_SIZE];
+      w_requested_tag = S_W_ADDR[`ADDRESS_TAG_SLICE];
+      w_requested_index = S_W_ADDR[`ADDRESS_INDEX_SLICE];
 
       w_selected_data = cache[w_requested_index].data;
       w_selected_tag = cache[w_requested_index].tag;
@@ -162,10 +163,11 @@ module L1_D #(
     end else begin
       state <= next_state;
       w_state <= next_w_state;
-      latched_r_requested_address <= next_latched_r_requested_address;
+      
+			latched_r_requested_address <= next_latched_r_requested_address;
       latched_w_requested_address <= next_latched_w_requested_address;
       latched_w_data_buffer <= next_latched_w_data_buffer;
-      latched_w_requested_address <= next_latched_w_requested_address;
+
       r_buffer_index <= next_r_buffer_index;
       w_buffer_index <= next_w_buffer_index;
       cache <= next_cache;
@@ -191,7 +193,7 @@ always_comb begin
     case (state) 
         IDLE: begin
             S_W_COMPLETE = 0;
-            if(m_axi_acsnoop && m_axi_acaddr == 63'hD && cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
+            if(m_axi_acvalid && m_axi_acsnoop == 63'hD && cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
                 next_cache[ac_addr_requested_index].state[1] = 0;
             end else begin
                 if (S_R_ADDR_VALID && (r_requested_tag != r_selected_tag || !r_selected_block_is_valid)) begin
@@ -298,8 +300,8 @@ always_comb begin
         W_DONE: begin
             S_W_COMPLETE = 1;
             next_state = IDLE;
-            next_latched_s_w_contains_request = 0;
-            if (latched_w_requested_address == latched_s_w_request_addr) next_latched_s_w_contains_request = 0;
+            next_latched_s_w_contains_request = 0; // TODO: CHECK
+            // if (latched_w_requested_address == latched_s_w_request_addr) next_latched_s_w_contains_request = 0;
         end
     endcase
 end

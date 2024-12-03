@@ -204,7 +204,8 @@ module top
     .m_axi_bvalid(m_axi_bvalid),
     .m_axi_bready(m_axi_bready),
     .m_axi_acsnoop(m_axi_acsnoop),
-    .m_axi_acaddr(m_axi_acaddr)
+    .m_axi_acaddr(m_axi_acaddr),
+    .m_axi_acvalid(m_axi_acvalid)
   );
 
   L1_I l1_i(
@@ -249,7 +250,8 @@ module top
     .L2_S_W_READY(L2_S_W_READY),
     .L2_S_W_COMPLETE(L2_S_W_COMPLETE),
     .m_axi_acsnoop(m_axi_acsnoop),
-    .m_axi_acaddr(m_axi_acaddr)
+    .m_axi_acaddr(m_axi_acaddr),
+    .m_axi_acvalid(m_axi_acvalid)
   );
 
   pipeline_fetch if_stage(
@@ -352,6 +354,7 @@ module top
   always_ff @ (posedge clk) begin
     if (reset) begin
       pc <= entry;
+      m_axi_acready <= 1;
     end else begin
       ecall <= next_ecall_ex ? next_ecall : 0;
 

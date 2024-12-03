@@ -49,9 +49,9 @@ module register_file
 			// registers[8] <= 63'h1000;
 			// registers[9] <= 63'h2000;
 			// registers[10] <= 63'h3000;
-			// registers[11] <= 5;
-			// registers[12] <= 10;
-			// registers[13] <= 14;
+			// registers[11] <= 63'hAAAAAAAAAAAA;
+			// registers[12] <= 63'hBBBBBBBBBBBB;
+			// registers[13] <= 63'hCCCCCCCCCCCC;
 		end else begin
 			if(write_enable) begin
 				registers[write_register] <= write_register == 0 ? 0 : write_value;	

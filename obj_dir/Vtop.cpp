@@ -86,7 +86,7 @@ void Vtop::_initial__TOP__1(Vtop__Syms* __restrict vlSymsp) {
     vlTOPp->m_axi_arlen = 7U;
     // INITIAL at top.sv:153
     vlTOPp->m_axi_awlen = 7U;
-    // INITIAL at top.sv:482
+    // INITIAL at top.sv:485
     VL_WRITEF("Initializing top, entry point = 0x%x\n",
 	      64,vlTOPp->entry);
 }
@@ -99,36 +99,26 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
     VL_SIG8(__Vdlyvset__top__DOT__rf__DOT__registers__v0,0,0);
     VL_SIG8(__Vdlyvdim0__top__DOT__rf__DOT__registers__v33,4,0);
     VL_SIG8(__Vdlyvset__top__DOT__rf__DOT__registers__v33,0,0);
-    VL_SIG8(__Vdly__top__DOT__llc__DOT__w_state,2,0);
-    VL_SIG8(__Vdly__top__DOT__llc__DOT__w_buffer_index,2,0);
-    //char	__VpadToAlign30[2];
+    VL_SIG8(__Vdly__top__DOT__mem_stage__DOT__state,2,0);
+    //char	__VpadToAlign29[3];
     VL_SIG64(__Vtask_do_ecall__0__a0ret,63,0);
     VL_SIG64(__Vdlyvval__top__DOT__rf__DOT__registers__v32,63,0);
     VL_SIG64(__Vdlyvval__top__DOT__rf__DOT__registers__v33,63,0);
     // Body
-    __Vdly__top__DOT__llc__DOT__w_buffer_index = vlTOPp->top__DOT__llc__DOT__w_buffer_index;
-    __Vdly__top__DOT__llc__DOT__w_state = vlTOPp->top__DOT__llc__DOT__w_state;
     __Vdly__top__DOT__jump_signal_applied = vlTOPp->top__DOT__jump_signal_applied;
     __Vdlyvset__top__DOT__rf__DOT__registers__v0 = 0U;
     __Vdlyvset__top__DOT__rf__DOT__registers__v33 = 0U;
+    __Vdly__top__DOT__mem_stage__DOT__state = vlTOPp->top__DOT__mem_stage__DOT__state;
     // ALWAYS at pipeline_fetch.sv:26
     vlTOPp->top__DOT__if_stage__DOT__state = ((IData)(vlTOPp->reset)
 					       ? 0U
 					       : (IData)(vlTOPp->top__DOT__if_stage__DOT__next_state));
-    // ALWAYS at LLC.sv:174
-    if ((2U == (IData)(vlTOPp->top__DOT__llc__DOT__w_state))) {
-	// Function: do_pending_write at LLC.sv:177
-	vlSymsp->TOP____024unit.__Vdpiimwrap_do_pending_write_TOP____024unit(
-									     (vlTOPp->m_axi_awaddr 
-									      + 
-									      ((QData)((IData)(vlTOPp->top__DOT__llc__DOT__w_buffer_index)) 
-									       << 3U)), vlTOPp->m_axi_wdata, 8U);
-    }
+    // ALWAYS at LLC.sv:176
     if (vlTOPp->reset) {
 	vlTOPp->top__DOT__llc__DOT__state = 0U;
     } else {
 	vlTOPp->top__DOT__llc__DOT__state = vlTOPp->top__DOT__llc__DOT__next_state;
-	__Vdly__top__DOT__llc__DOT__w_state = vlTOPp->top__DOT__llc__DOT__next_w_state;
+	vlTOPp->top__DOT__llc__DOT__w_state = vlTOPp->top__DOT__llc__DOT__next_w_state;
 	vlTOPp->top__DOT__llc__DOT__latched_r_requested_address 
 	    = vlTOPp->top__DOT__llc__DOT__next_latched_r_requested_address;
 	vlTOPp->top__DOT__llc__DOT__latched_w_requested_address 
@@ -167,7 +157,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 	    = vlTOPp->top__DOT__llc__DOT__next_latched_w_data_buffer[0xfU];
 	vlTOPp->top__DOT__llc__DOT__r_buffer_index 
 	    = vlTOPp->top__DOT__llc__DOT__next_r_buffer_index;
-	__Vdly__top__DOT__llc__DOT__w_buffer_index 
+	vlTOPp->top__DOT__llc__DOT__w_buffer_index 
 	    = vlTOPp->top__DOT__llc__DOT__next_w_buffer_index;
 	vlTOPp->top__DOT__llc__DOT__cache[0U] = vlTOPp->top__DOT__llc__DOT__next_cache[0U];
 	vlTOPp->top__DOT__llc__DOT__cache[1U] = vlTOPp->top__DOT__llc__DOT__next_cache[1U];
@@ -2457,7 +2447,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 	vlTOPp->top__DOT__llc__DOT__last_chosen = vlTOPp->top__DOT__llc__DOT__next_last_chosen;
 	vlTOPp->top__DOT__llc__DOT__latched_w_requested_address 
 	    = vlTOPp->top__DOT__llc__DOT__next_latched_w_requested_address;
-	__Vdly__top__DOT__llc__DOT__w_state = vlTOPp->top__DOT__llc__DOT__next_w_state;
+	vlTOPp->top__DOT__llc__DOT__w_state = vlTOPp->top__DOT__llc__DOT__next_w_state;
     }
     // ALWAYS at L1-I.sv:84
     if (vlTOPp->reset) {
@@ -4720,11 +4710,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 	    = vlTOPp->top__DOT__l1_i__DOT__next_cache[0x469U];
 	vlTOPp->top__DOT__l1_i__DOT__r_state = vlTOPp->top__DOT__l1_i__DOT__next_r_state;
     }
-    // ALWAYS at pipeline_memory.sv:53
-    vlTOPp->top__DOT__mem_stage__DOT__state = ((IData)(vlTOPp->reset)
-					        ? 0U
-					        : (IData)(vlTOPp->top__DOT__mem_stage__DOT__next_state));
-    // ALWAYS at L1-D.sv:158
+    // ALWAYS at L1-D.sv:159
     if (vlTOPp->reset) {
 	vlTOPp->top__DOT__l1_d__DOT__state = 0U;
     } else {
@@ -7037,8 +7023,6 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 	vlTOPp->top__DOT__l1_d__DOT__w_complete = vlTOPp->top__DOT__l1_d__DOT__next_w_complete;
 	vlTOPp->top__DOT__l1_d__DOT__pending_cache_write 
 	    = vlTOPp->top__DOT__l1_d__DOT__next_pending_cache_write;
-	vlTOPp->top__DOT__l1_d__DOT__latched_w_requested_address 
-	    = vlTOPp->top__DOT__l1_d__DOT__next_latched_w_requested_address;
 	vlTOPp->top__DOT__l1_d__DOT__w_state = vlTOPp->top__DOT__l1_d__DOT__next_w_state;
     }
     // ALWAYS at register_file.sv:41
@@ -7057,8 +7041,19 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 		= vlTOPp->top__DOT__mem_dst_reg;
 	}
     }
-    vlTOPp->top__DOT__llc__DOT__w_buffer_index = __Vdly__top__DOT__llc__DOT__w_buffer_index;
-    vlTOPp->top__DOT__llc__DOT__w_state = __Vdly__top__DOT__llc__DOT__w_state;
+    // ALWAYS at pipeline_memory.sv:53
+    __Vdly__top__DOT__mem_stage__DOT__state = ((IData)(vlTOPp->reset)
+					        ? 0U
+					        : (IData)(vlTOPp->top__DOT__mem_stage__DOT__next_state));
+    if (((4U == (IData)(vlTOPp->top__DOT__mem_stage__DOT__state)) 
+	 & (IData)(vlTOPp->top__DOT__L1_D_S_W_COMPLETE))) {
+	// Function: do_pending_write at pipeline_memory.sv:61
+	vlSymsp->TOP____024unit.__Vdpiimwrap_do_pending_write_TOP____024unit(vlTOPp->top__DOT__L1_D_S_W_ADDR, vlTOPp->top__DOT__L1_D_S_W_DATA, 
+									     VL_POWSS_III(32,32,2, (IData)(2U), 
+										(3U 
+										& (IData)(vlTOPp->top__DOT__L1_D_S_W_SIZE)), 1,0));
+    }
+    vlTOPp->top__DOT__mem_stage__DOT__state = __Vdly__top__DOT__mem_stage__DOT__state;
     // ALWAYS at L1-I.sv:113
     if ((0U == (IData)(vlTOPp->top__DOT__l1_i__DOT__r_state))) {
 	vlTOPp->top__DOT__L2_S_R_ADDR_VALID_I = 0U;
@@ -7068,7 +7063,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 	    vlTOPp->top__DOT__L2_S_R_ADDR_VALID_I = 1U;
 	}
     }
-    // ALWAYS at L1-D.sv:334
+    // ALWAYS at L1-D.sv:336
     if ((0U == (IData)(vlTOPp->top__DOT__l1_d__DOT__w_state))) {
 	vlTOPp->top__DOT__L2_S_W_VALID = 0U;
     } else {
@@ -7109,7 +7104,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						    | ((QData)((IData)(
 								       vlTOPp->top__DOT__l1_d__DOT__cache[0x411U])) 
 						       >> 0x12U)));
-    // ALWAYS at L1-D.sv:308
+    // ALWAYS at L1-D.sv:310
     if ((0U == (IData)(vlTOPp->top__DOT__l1_d__DOT__r_state))) {
 	vlTOPp->top__DOT__L2_S_R_ADDR_VALID_D = 0U;
     } else {
@@ -7119,9 +7114,10 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 	    vlTOPp->top__DOT__L2_S_R_ADDR_VALID_D = 1U;
 	}
     }
-    // ALWAYS at top.sv:352
+    // ALWAYS at top.sv:354
     if (vlTOPp->reset) {
 	vlTOPp->top__DOT__pc = vlTOPp->entry;
+	vlTOPp->m_axi_acready = 1U;
     } else {
 	vlTOPp->top__DOT__ecall = (1U & ((IData)(vlTOPp->top__DOT__next_ecall_ex)
 					  ? (IData)(vlTOPp->top__DOT__next_ecall)
@@ -7269,7 +7265,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
     vlTOPp->top__DOT__next_mem_dst_reg = vlTOPp->top__DOT__ex_dst_reg;
     vlTOPp->top__DOT____Vcellinp__ex_stage__mem_opcode 
 	= vlTOPp->top__DOT__mem_opcode_ex;
-    // ALWAYS at pipeline_memory.sv:85
+    // ALWAYS at pipeline_memory.sv:114
     vlTOPp->top__DOT__wb_dst_reg = vlTOPp->top__DOT__mem_dst_reg;
     // ALWAYS at register_file.sv:27
     if (vlTOPp->reset) {
@@ -9178,7 +9174,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
     vlTOPp->top__DOT__L1_I_S_R_DATA_VALID = ((vlTOPp->top__DOT__l1_i__DOT__r_selected_tag 
 					      == vlTOPp->top__DOT__l1_i__DOT__r_requested_tag) 
 					     & (IData)(vlTOPp->top__DOT__l1_i__DOT__r_selected_block_is_valid));
-    // ALWAYS at pipeline_memory.sv:61
+    // ALWAYS at pipeline_memory.sv:90
     if ((0U == (IData)(vlTOPp->top__DOT__mem_stage__DOT__state))) {
 	vlTOPp->top__DOT__L1_D_S_R_ADDR_VALID = 0U;
 	vlTOPp->top__DOT__L1_D_S_W_VALID = 0U;
@@ -9254,19 +9250,19 @@ VL_INLINE_OPT void Vtop::_combo__TOP__3(Vtop__Syms* __restrict vlSymsp) {
     VL_DEBUG_IF(VL_PRINTF("    Vtop::_combo__TOP__3\n"); );
     Vtop* __restrict vlTOPp VL_ATTR_UNUSED = vlSymsp->TOPp;
     // Body
-    // ALWAYS at LLC.sv:143
+    // ALWAYS at LLC.sv:144
     vlTOPp->top__DOT__llc__DOT__ac_addr_requested_tag 
 	= (VL_ULL(0xfffffffffffff) & (vlTOPp->m_axi_acaddr 
 				      >> 0xcU));
     vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index 
 	= (0x3fU & (IData)((vlTOPp->m_axi_acaddr >> 6U)));
-    // ALWAYS at L1-D.sv:133
+    // ALWAYS at L1-D.sv:134
     vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_tag 
 	= (VL_ULL(0xfffffffffffff) & (vlTOPp->m_axi_acaddr 
 				      >> 0xcU));
     vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index 
 	= (0x3fU & (IData)((vlTOPp->m_axi_acaddr >> 6U)));
-    // ALWAYS at LLC.sv:311
+    // ALWAYS at LLC.sv:314
     if ((0U == (IData)(vlTOPp->top__DOT__llc__DOT__w_state))) {
 	vlTOPp->m_axi_bready = 0U;
 	vlTOPp->top__DOT__llc__DOT__next_w_buffer_index = 0U;
@@ -9377,7 +9373,7 @@ VL_INLINE_OPT void Vtop::_combo__TOP__3(Vtop__Syms* __restrict vlSymsp) {
 	    }
 	}
     }
-    // ALWAYS at LLC.sv:276
+    // ALWAYS at LLC.sv:278
     if ((0U == (IData)(vlTOPp->top__DOT__llc__DOT__r_state))) {
 	vlTOPp->m_axi_araddr = VL_ULL(0);
 	vlTOPp->top__DOT__llc__DOT__next_r_buffer_index = 0U;
@@ -9509,19 +9505,19 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
     VL_SIGW(__Vtemp33,127,0,4);
     VL_SIGW(__Vtemp34,127,0,4);
     // Body
-    // ALWAYS at LLC.sv:143
+    // ALWAYS at LLC.sv:144
     vlTOPp->top__DOT__llc__DOT__ac_addr_requested_tag 
 	= (VL_ULL(0xfffffffffffff) & (vlTOPp->m_axi_acaddr 
 				      >> 0xcU));
     vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index 
 	= (0x3fU & (IData)((vlTOPp->m_axi_acaddr >> 6U)));
-    // ALWAYS at L1-D.sv:133
+    // ALWAYS at L1-D.sv:134
     vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_tag 
 	= (VL_ULL(0xfffffffffffff) & (vlTOPp->m_axi_acaddr 
 				      >> 0xcU));
     vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index 
 	= (0x3fU & (IData)((vlTOPp->m_axi_acaddr >> 6U)));
-    // ALWAYS at LLC.sv:311
+    // ALWAYS at LLC.sv:314
     if ((0U == (IData)(vlTOPp->top__DOT__llc__DOT__w_state))) {
 	vlTOPp->m_axi_bready = 0U;
 	vlTOPp->top__DOT__llc__DOT__next_w_buffer_index = 0U;
@@ -9632,7 +9628,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 	    }
 	}
     }
-    // ALWAYS at LLC.sv:276
+    // ALWAYS at LLC.sv:278
     if ((0U == (IData)(vlTOPp->top__DOT__llc__DOT__r_state))) {
 	vlTOPp->m_axi_araddr = VL_ULL(0);
 	vlTOPp->top__DOT__llc__DOT__next_r_buffer_index = 0U;
@@ -9754,7 +9750,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 	    vlTOPp->top__DOT__L2_S_R_ADDR_VALID_I = 1U;
 	}
     }
-    // ALWAYS at L1-D.sv:334
+    // ALWAYS at L1-D.sv:336
     if ((0U == (IData)(vlTOPp->top__DOT__l1_d__DOT__w_state))) {
 	vlTOPp->top__DOT__L2_S_W_VALID = 0U;
     } else {
@@ -9795,7 +9791,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						    | ((QData)((IData)(
 								       vlTOPp->top__DOT__l1_d__DOT__cache[0x411U])) 
 						       >> 0x12U)));
-    // ALWAYS at L1-D.sv:308
+    // ALWAYS at L1-D.sv:310
     if ((0U == (IData)(vlTOPp->top__DOT__l1_d__DOT__r_state))) {
 	vlTOPp->top__DOT__L2_S_R_ADDR_VALID_D = 0U;
     } else {
@@ -9813,7 +9809,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
     vlTOPp->top__DOT__next_mem_dst_reg = vlTOPp->top__DOT__ex_dst_reg;
     vlTOPp->top__DOT____Vcellinp__ex_stage__mem_opcode 
 	= vlTOPp->top__DOT__mem_opcode_ex;
-    // ALWAYS at pipeline_memory.sv:85
+    // ALWAYS at pipeline_memory.sv:114
     vlTOPp->top__DOT__wb_dst_reg = vlTOPp->top__DOT__mem_dst_reg;
     // ALWAYS at pipeline_ex.sv:72
     vlTOPp->top__DOT__next_r2_val_mem = vlTOPp->top__DOT__r2_val;
@@ -11690,7 +11686,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
     vlTOPp->top__DOT__L1_I_S_R_DATA_VALID = ((vlTOPp->top__DOT__l1_i__DOT__r_selected_tag 
 					      == vlTOPp->top__DOT__l1_i__DOT__r_requested_tag) 
 					     & (IData)(vlTOPp->top__DOT__l1_i__DOT__r_selected_block_is_valid));
-    // ALWAYS at pipeline_memory.sv:61
+    // ALWAYS at pipeline_memory.sv:90
     if ((0U == (IData)(vlTOPp->top__DOT__mem_stage__DOT__state))) {
 	vlTOPp->top__DOT__L1_D_S_R_ADDR_VALID = 0U;
 	vlTOPp->top__DOT__L1_D_S_W_VALID = 0U;
@@ -11720,7 +11716,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						     ? 2U
 						     : 1U)
 						    : 0U);
-    // ALWAYS at LLC.sv:154
+    // ALWAYS at LLC.sv:155
     vlTOPp->top__DOT__llc__DOT__w_requested_index = 
 	(0x3fU & (IData)((vlTOPp->top__DOT__L2_S_W_ADDR 
 			  >> 6U)));
@@ -12217,7 +12213,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						    >> 5U))] 
 	      >> (0x1fU & ((IData)(0x34U) + ((IData)(0x236U) 
 					     * (IData)(vlTOPp->top__DOT__llc__DOT__w_requested_index))))));
-    // ALWAYS at LLC.sv:125
+    // ALWAYS at LLC.sv:126
     vlTOPp->top__DOT__llc__DOT__r1_requested_tag = 
 	(VL_ULL(0xfffffffffffff) & (vlTOPp->top__DOT__L2_S_R_ADDR_I 
 				    >> 0xcU));
@@ -13714,7 +13710,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 			  ? 0U : 2U));
 	}
     }
-    // ALWAYS at L1-D.sv:141
+    // ALWAYS at L1-D.sv:142
     vlTOPp->top__DOT__l1_d__DOT__w_requested_index 
 	= (0x3fU & (IData)((vlTOPp->top__DOT__L1_D_S_W_ADDR 
 			    >> 6U)));
@@ -14211,7 +14207,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						     >> 5U))] 
 	      >> (0x1fU & ((IData)(0x34U) + ((IData)(0x236U) 
 					     * (IData)(vlTOPp->top__DOT__l1_d__DOT__w_requested_index))))));
-    // ALWAYS at L1-D.sv:121
+    // ALWAYS at L1-D.sv:122
     vlTOPp->top__DOT__l1_d__DOT__r_requested_tag = 
 	(VL_ULL(0xfffffffffffff) & (vlTOPp->top__DOT__L1_D_S_R_ADDR 
 				    >> 0xcU));
@@ -14808,7 +14804,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
     VL_SIGW(__Vtemp67,127,0,4);
     VL_SIGW(__Vtemp68,127,0,4);
     // Body
-    // ALWAYS at LLC.sv:154
+    // ALWAYS at LLC.sv:155
     vlTOPp->top__DOT__llc__DOT__w_requested_index = 
 	(0x3fU & (IData)((vlTOPp->top__DOT__L2_S_W_ADDR 
 			  >> 6U)));
@@ -15305,7 +15301,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 						    >> 5U))] 
 	      >> (0x1fU & ((IData)(0x34U) + ((IData)(0x236U) 
 					     * (IData)(vlTOPp->top__DOT__llc__DOT__w_requested_index))))));
-    // ALWAYS at LLC.sv:125
+    // ALWAYS at LLC.sv:126
     vlTOPp->top__DOT__llc__DOT__r1_requested_tag = 
 	(VL_ULL(0xfffffffffffff) & (vlTOPp->top__DOT__L2_S_R_ADDR_I 
 				    >> 0xcU));
@@ -16802,7 +16798,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 			  ? 0U : 2U));
 	}
     }
-    // ALWAYS at L1-D.sv:141
+    // ALWAYS at L1-D.sv:142
     vlTOPp->top__DOT__l1_d__DOT__w_requested_index 
 	= (0x3fU & (IData)((vlTOPp->top__DOT__L1_D_S_W_ADDR 
 			    >> 6U)));
@@ -17299,7 +17295,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 						     >> 5U))] 
 	      >> (0x1fU & ((IData)(0x34U) + ((IData)(0x236U) 
 					     * (IData)(vlTOPp->top__DOT__l1_d__DOT__w_requested_index))))));
-    // ALWAYS at L1-D.sv:121
+    // ALWAYS at L1-D.sv:122
     vlTOPp->top__DOT__l1_d__DOT__r_requested_tag = 
 	(VL_ULL(0xfffffffffffff) & (vlTOPp->top__DOT__L1_D_S_R_ADDR 
 				    >> 0xcU));
@@ -17985,7 +17981,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 	    }
 	}
     }
-    // ALWAYS at L1-D.sv:320
+    // ALWAYS at L1-D.sv:322
     if ((1U == (IData)(vlTOPp->top__DOT__l1_d__DOT__r_state))) {
 	if (vlTOPp->top__DOT__L2_S_R_DATA_VALID_D) {
 	    vlTOPp->top__DOT__l1_d__DOT____Vlvbound17[0U] 
@@ -18186,7 +18182,7 @@ void Vtop::_settle__TOP__6(Vtop__Syms* __restrict vlSymsp) {
 	    }
 	}
     }
-    // ALWAYS at L1-D.sv:320
+    // ALWAYS at L1-D.sv:322
     if ((1U == (IData)(vlTOPp->top__DOT__l1_d__DOT__r_state))) {
 	if (vlTOPp->top__DOT__L2_S_R_DATA_VALID_D) {
 	    vlTOPp->top__DOT__l1_d__DOT____Vlvbound17[0U] 
@@ -18268,7 +18264,7 @@ void Vtop::_settle__TOP__6(Vtop__Syms* __restrict vlSymsp) {
 	    }
 	}
     }
-    // ALWAYS at LLC.sv:201
+    // ALWAYS at LLC.sv:203
     if (((~ (IData)(vlTOPp->top__DOT__llc__DOT__latched_s_w_contains_request)) 
 	 & (IData)(vlTOPp->top__DOT__L2_S_W_VALID))) {
 	vlTOPp->top__DOT__llc__DOT__next_latched_s_w_contains_request = 1U;
@@ -18309,7 +18305,8 @@ void Vtop::_settle__TOP__6(Vtop__Syms* __restrict vlSymsp) {
     }
     if ((0U == (IData)(vlTOPp->top__DOT__llc__DOT__state))) {
 	vlTOPp->top__DOT__L2_S_W_COMPLETE = 0U;
-	if ((((0xdU == (IData)(vlTOPp->m_axi_acsnoop)) 
+	if (((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
+						 == (IData)(vlTOPp->m_axi_acsnoop))) 
 	      & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
 					 + ((IData)(0x236U) 
 					    * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))) 
@@ -21198,7 +21195,7 @@ void Vtop::_settle__TOP__6(Vtop__Syms* __restrict vlSymsp) {
 	    }
 	}
     }
-    // ALWAYS at L1-D.sv:184
+    // ALWAYS at L1-D.sv:186
     if (((~ (IData)(vlTOPp->top__DOT__l1_d__DOT__latched_s_w_contains_request)) 
 	 & (IData)(vlTOPp->top__DOT__L1_D_S_W_VALID))) {
 	vlTOPp->top__DOT__l1_d__DOT__next_latched_s_w_contains_request = 1U;
@@ -21211,8 +21208,8 @@ void Vtop::_settle__TOP__6(Vtop__Syms* __restrict vlSymsp) {
     }
     if ((0U == (IData)(vlTOPp->top__DOT__l1_d__DOT__state))) {
 	vlTOPp->top__DOT__L1_D_S_W_COMPLETE = 0U;
-	if (((((0U != (IData)(vlTOPp->m_axi_acsnoop)) 
-	       & (VL_ULL(0xd) == vlTOPp->m_axi_acaddr)) 
+	if (((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
+						 == (IData)(vlTOPp->m_axi_acsnoop))) 
 	      & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
 					 + ((IData)(0x236U) 
 					    * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))) 
@@ -23845,10 +23842,6 @@ void Vtop::_settle__TOP__6(Vtop__Syms* __restrict vlSymsp) {
 			    vlTOPp->top__DOT__L1_D_S_W_COMPLETE = 1U;
 			    vlTOPp->top__DOT__l1_d__DOT__next_state = 0U;
 			    vlTOPp->top__DOT__l1_d__DOT__next_latched_s_w_contains_request = 0U;
-			    if ((vlTOPp->top__DOT__l1_d__DOT__latched_w_requested_address 
-				 == vlTOPp->top__DOT__l1_d__DOT__latched_s_w_request_addr)) {
-				vlTOPp->top__DOT__l1_d__DOT__next_latched_s_w_contains_request = 0U;
-			    }
 			}
 		    }
 		}
@@ -23865,7 +23858,7 @@ VL_INLINE_OPT void Vtop::_combo__TOP__7(Vtop__Syms* __restrict vlSymsp) {
     VL_SIGW(__Vtemp107,511,0,16);
     VL_SIGW(__Vtemp115,511,0,16);
     // Body
-    // ALWAYS at LLC.sv:201
+    // ALWAYS at LLC.sv:203
     if (((~ (IData)(vlTOPp->top__DOT__llc__DOT__latched_s_w_contains_request)) 
 	 & (IData)(vlTOPp->top__DOT__L2_S_W_VALID))) {
 	vlTOPp->top__DOT__llc__DOT__next_latched_s_w_contains_request = 1U;
@@ -23906,7 +23899,8 @@ VL_INLINE_OPT void Vtop::_combo__TOP__7(Vtop__Syms* __restrict vlSymsp) {
     }
     if ((0U == (IData)(vlTOPp->top__DOT__llc__DOT__state))) {
 	vlTOPp->top__DOT__L2_S_W_COMPLETE = 0U;
-	if ((((0xdU == (IData)(vlTOPp->m_axi_acsnoop)) 
+	if (((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
+						 == (IData)(vlTOPp->m_axi_acsnoop))) 
 	      & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
 					 + ((IData)(0x236U) 
 					    * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))) 
@@ -26739,7 +26733,7 @@ VL_INLINE_OPT void Vtop::_combo__TOP__7(Vtop__Syms* __restrict vlSymsp) {
 	    }
 	}
     }
-    // ALWAYS at L1-D.sv:184
+    // ALWAYS at L1-D.sv:186
     if (((~ (IData)(vlTOPp->top__DOT__l1_d__DOT__latched_s_w_contains_request)) 
 	 & (IData)(vlTOPp->top__DOT__L1_D_S_W_VALID))) {
 	vlTOPp->top__DOT__l1_d__DOT__next_latched_s_w_contains_request = 1U;
@@ -26752,8 +26746,8 @@ VL_INLINE_OPT void Vtop::_combo__TOP__7(Vtop__Syms* __restrict vlSymsp) {
     }
     if ((0U == (IData)(vlTOPp->top__DOT__l1_d__DOT__state))) {
 	vlTOPp->top__DOT__L1_D_S_W_COMPLETE = 0U;
-	if (((((0U != (IData)(vlTOPp->m_axi_acsnoop)) 
-	       & (VL_ULL(0xd) == vlTOPp->m_axi_acaddr)) 
+	if (((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
+						 == (IData)(vlTOPp->m_axi_acsnoop))) 
 	      & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
 					 + ((IData)(0x236U) 
 					    * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))) 
@@ -29406,17 +29400,13 @@ VL_INLINE_OPT void Vtop::_combo__TOP__7(Vtop__Syms* __restrict vlSymsp) {
 			    vlTOPp->top__DOT__L1_D_S_W_COMPLETE = 1U;
 			    vlTOPp->top__DOT__l1_d__DOT__next_state = 0U;
 			    vlTOPp->top__DOT__l1_d__DOT__next_latched_s_w_contains_request = 0U;
-			    if ((vlTOPp->top__DOT__l1_d__DOT__latched_w_requested_address 
-				 == vlTOPp->top__DOT__l1_d__DOT__latched_s_w_request_addr)) {
-				vlTOPp->top__DOT__l1_d__DOT__next_latched_s_w_contains_request = 0U;
-			    }
 			}
 		    }
 		}
 	    }
 	}
     }
-    // ALWAYS at L1-D.sv:355
+    // ALWAYS at L1-D.sv:357
     if ((1U == (IData)(vlTOPp->top__DOT__l1_d__DOT__w_state))) {
 	vlTOPp->top__DOT__l1_d__DOT__next_w_state = 
 	    (7U & ((IData)(vlTOPp->top__DOT__L2_S_W_COMPLETE)
@@ -29426,7 +29416,7 @@ VL_INLINE_OPT void Vtop::_combo__TOP__7(Vtop__Syms* __restrict vlSymsp) {
 	    vlTOPp->top__DOT__l1_d__DOT__next_w_state = 0U;
 	}
     }
-    // ALWAYS at pipeline_memory.sv:88
+    // ALWAYS at pipeline_memory.sv:117
     if ((0U == (IData)(vlTOPp->top__DOT__mem_stage__DOT__state))) {
 	vlTOPp->top__DOT__wb_enable = 0U;
 	if ((0U == (IData)(vlTOPp->top__DOT__mem_opcode))) {
@@ -29523,7 +29513,7 @@ void Vtop::_settle__TOP__8(Vtop__Syms* __restrict vlSymsp) {
     VL_DEBUG_IF(VL_PRINTF("    Vtop::_settle__TOP__8\n"); );
     Vtop* __restrict vlTOPp VL_ATTR_UNUSED = vlSymsp->TOPp;
     // Body
-    // ALWAYS at L1-D.sv:355
+    // ALWAYS at L1-D.sv:357
     if ((1U == (IData)(vlTOPp->top__DOT__l1_d__DOT__w_state))) {
 	vlTOPp->top__DOT__l1_d__DOT__next_w_state = 
 	    (7U & ((IData)(vlTOPp->top__DOT__L2_S_W_COMPLETE)
@@ -29533,7 +29523,7 @@ void Vtop::_settle__TOP__8(Vtop__Syms* __restrict vlSymsp) {
 	    vlTOPp->top__DOT__l1_d__DOT__next_w_state = 0U;
 	}
     }
-    // ALWAYS at pipeline_memory.sv:88
+    // ALWAYS at pipeline_memory.sv:117
     if ((0U == (IData)(vlTOPp->top__DOT__mem_stage__DOT__state))) {
 	vlTOPp->top__DOT__wb_enable = 0U;
 	if ((0U == (IData)(vlTOPp->top__DOT__mem_opcode))) {

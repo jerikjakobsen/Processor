@@ -53,7 +53,8 @@ module LLC #(
     input  wire  m_axi_bvalid,
     output wire  m_axi_bready,
 	input wire [63:0] m_axi_acaddr,
-    input wire [3:0] m_axi_acsnoop
+    input wire [3:0] m_axi_acsnoop,
+    input wire m_axi_acvalid
 );
 
     // States
@@ -166,16 +167,17 @@ module LLC #(
       line1_active = S1_R_ADDR_VALID && (r1_selected_tag != r1_requested_tag || !r1_selected_block_is_valid);
       line2_active = (S2_R_ADDR_VALID && r2_selected_tag != r2_requested_tag || !r2_selected_block_is_valid) || (latched_s_w_contains_request);
       S_W_READY = !latched_s_w_contains_request;
+      
       if (line1_active && line2_active) begin
         service_line = !last_chosen;
       end else service_line = line2_active;
     end
 
   always_ff @ (posedge clk) begin
-    if(w_state == AXI_W_MEM) begin
-        // $display("pending write!");
-        do_pending_write(m_axi_awaddr + w_buffer_index * 8, m_axi_wdata, 8);
-    end
+    // if(w_state == AXI_W_MEM) begin
+    //     // $display("pending write!");
+    //     do_pending_write(m_axi_awaddr + w_buffer_index * 8, m_axi_wdata, 8);
+    // end
 
     if (reset) begin
       state <= IDLE;
@@ -207,7 +209,7 @@ always_comb begin
     case (state)
         IDLE: begin
             S_W_COMPLETE = 0;
-            if(m_axi_acsnoop == 63'hD && cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
+            if(m_axi_acvalid && m_axi_acsnoop == 63'hD && cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
                 next_cache[ac_addr_requested_index].state[1] = 0;
             end else begin
                 if (line1_active && !service_line) begin // Handle line 1 (READ ONLY) Will Only come here if line1 address is a miss
@@ -293,6 +295,7 @@ always_comb begin
             m_axi_arvalid = 0;
 
             if(m_axi_rvalid) begin
+                // next_cache[latched_r_requested_index].data[(r_buffer_index+1)*64-1-:64] = m_axi_rdata;
                 next_cache[latched_r_requested_index].data[(r_buffer_index+1)*64-1-:64] = m_axi_rdata;
                 next_r_buffer_index = r_buffer_index + 1;
                 if (m_axi_rlast) begin

@@ -62,7 +62,7 @@ module pipeline_ex
   assign operand2 = (imm_or_reg2) ? imm : r2_val;
 
   logic tmp_signal;
-  assign tmp_signal = instruction_pc == 63'h10920;
+  assign tmp_signal = instruction_pc == 63'h22f9c;
 
   always_comb begin
     ready = (opcode == 0 || next_stage_ready);
