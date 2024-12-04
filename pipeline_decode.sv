@@ -481,7 +481,7 @@ module pipeline_decode
           r2_reg = 0;
           if(instruction_pc != 0) begin
             $display("UNKNOWN INSTRUCTION at PC: %h: %h", instruction_pc, instruction);
-            $finish();
+            // $finish();
           end
         end
       endcase

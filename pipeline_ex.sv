@@ -128,21 +128,38 @@ module pipeline_ex
           if(unsigned_op == 1) begin
             ex_res = {{32{1'b0}}, (r1_val[31:0] >> operand2)};
           end else begin
-            temp_result = r1_val[31:0] >>> operand2;
+            if (r1_val[63]) begin
+              // Sign-extend MSBs on right shift
+              temp_result = (r1_val >> operand2) | ~((1 << (64 - operand2)) - 1);
+            end else begin
+              temp_result = r1_val >> operand2;
+            end
+
+            // temp_result = r1_val[31:0] >>> operand2;
             ex_res = $signed(temp_result[31:0]);
           end
         end else begin
           if(unsigned_op == 1) begin
             ex_res = r1_val >> operand2;
           end else begin
-            ex_res = r1_val >>> operand2;
+            if (r1_val[63]) begin
+              // Sign-extend MSBs on right shift
+              ex_res = (r1_val >> operand2) | ~((1 << (64 - operand2)) - 1);
+            end else begin
+              ex_res = r1_val >> operand2;
+            end
+            // ex_res = $unsigned($signed(r1_val) >>> operand2);
           end
         end
       end
 
       SET_LESS_THAN: begin
         jump_signal = 0;
-        ex_res = (r1_val < (unsigned_op == 1 ? $unsigned(imm) : imm)) ? 1 : 0;
+        if(unsigned_op == 1) begin
+          ex_res = $unsigned(r1_val) < $unsigned(imm) ? 1 : 0;
+        end else begin
+          ex_res = $signed(r1_val) < $signed(imm) ? 1 : 0;
+        end
       end
       
       MUL: begin
