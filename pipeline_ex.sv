@@ -62,7 +62,7 @@ module pipeline_ex
   assign operand2 = (imm_or_reg2) ? imm : r2_val;
 
   logic tmp_signal;
-  assign tmp_signal = instruction_pc == 63'h22f9c;
+  assign tmp_signal = instruction_pc == 64'h1aa6c; // 63'h22f40;
 
   always_comb begin
     ready = (opcode == 0 || next_stage_ready);
@@ -130,9 +130,9 @@ module pipeline_ex
           end else begin
             if (r1_val[63]) begin
               // Sign-extend MSBs on right shift
-              temp_result = (r1_val >> operand2) | ~((1 << (64 - operand2)) - 1);
+              temp_result = (r1_val[31:0] >> operand2) | ~((1 << (64 - operand2)) - 1);
             end else begin
-              temp_result = r1_val >> operand2;
+              temp_result = r1_val[31:0] >> operand2;
             end
 
             // temp_result = r1_val[31:0] >>> operand2;
@@ -156,9 +156,9 @@ module pipeline_ex
       SET_LESS_THAN: begin
         jump_signal = 0;
         if(unsigned_op == 1) begin
-          ex_res = $unsigned(r1_val) < $unsigned(imm) ? 1 : 0;
+          ex_res = $unsigned(r1_val) < $unsigned(operand2) ? 1 : 0;
         end else begin
-          ex_res = $signed(r1_val) < $signed(imm) ? 1 : 0;
+          ex_res = $signed(r1_val) < $signed(operand2) ? 1 : 0;
         end
       end
       

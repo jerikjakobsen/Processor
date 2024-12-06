@@ -117,7 +117,7 @@ void Vtop::traceChgThis__2(Vtop__Syms* __restrict vlSymsp, VerilatedVcd* vcdp, u
 	vcdp->chgBus  (c+99,(vlTOPp->top__DOT__id_stage__DOT__funct7),7);
 	vcdp->chgQuad (c+100,(vlTOPp->top__DOT__ex_stage__DOT__operand2),64);
 	vcdp->chgBit  (c+102,((VL_ULL(0x841a0) == vlTOPp->top__DOT__L1_D_S_R_ADDR)));
-	vcdp->chgBit  (c+103,((VL_ULL(0x28) == vlTOPp->top__DOT__L1_D_S_W_DATA)));
+	vcdp->chgBit  (c+103,((VL_ULL(0x3fbffe68) == vlTOPp->top__DOT__L1_D_S_W_ADDR)));
     }
 }
 
@@ -288,7 +288,7 @@ void Vtop::traceChgThis__7(Vtop__Syms* __restrict vlSymsp, VerilatedVcd* vcdp, u
 	vcdp->chgBit  (c+3801,((2U == (IData)(vlTOPp->top__DOT__rf__DOT__ecall_state))));
 	vcdp->chgBit  (c+3802,((1U & (~ (IData)(vlTOPp->top__DOT__l1_d__DOT__latched_s_w_contains_request)))));
 	vcdp->chgBit  (c+3803,((1U & (~ (IData)(vlTOPp->top__DOT__llc__DOT__latched_s_w_contains_request)))));
-	vcdp->chgBit  (c+3804,((VL_ULL(0x22f40) == vlTOPp->top__DOT__pc)));
+	vcdp->chgBit  (c+3804,((VL_ULL(0x296ac) == vlTOPp->top__DOT__pc)));
 	vcdp->chgQuad (c+3805,(vlTOPp->top__DOT__rf__DOT__registers[0]),64);
 	vcdp->chgQuad (c+3807,(vlTOPp->top__DOT__rf__DOT__registers[1]),64);
 	vcdp->chgQuad (c+3809,(vlTOPp->top__DOT__rf__DOT__registers[2]),64);
@@ -1481,7 +1481,7 @@ void Vtop::traceChgThis__7(Vtop__Syms* __restrict vlSymsp, VerilatedVcd* vcdp, u
 	vcdp->chgBus  (c+7398,(vlTOPp->top__DOT__if_stage__DOT__state),2);
 	vcdp->chgBus  (c+7399,(vlTOPp->top__DOT__mem_opcode_ex),32);
 	vcdp->chgBus  (c+7400,((7U & (IData)(vlTOPp->top__DOT__mem_operation_size_ex))),3);
-	vcdp->chgBit  (c+7401,((VL_ULL(0x22f9c) == vlTOPp->top__DOT__ex_instr_pc)));
+	vcdp->chgBit  (c+7401,((VL_ULL(0x1aa6c) == vlTOPp->top__DOT__ex_instr_pc)));
 	vcdp->chgBus  (c+7402,(vlTOPp->top__DOT__mem_stage__DOT__state),3);
     }
 }
@@ -1537,6 +1537,8 @@ void Vtop::traceChgThis__8(Vtop__Syms* __restrict vlSymsp, VerilatedVcd* vcdp, u
 	vcdp->chgBit  (c+7452,(vlTOPp->m_axi_acready));
 	vcdp->chgQuad (c+7453,(vlTOPp->m_axi_acaddr),64);
 	vcdp->chgBus  (c+7455,(vlTOPp->m_axi_acsnoop),4);
-	vcdp->chgBus  (c+7456,(vlTOPp->m_axi_acvalid),4);
+	vcdp->chgBit  (c+7456,((VL_ULL(0x3fbffe68) 
+				== vlTOPp->m_axi_acaddr)));
+	vcdp->chgBus  (c+7457,(vlTOPp->m_axi_acvalid),4);
     }
 }

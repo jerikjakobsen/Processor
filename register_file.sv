@@ -29,7 +29,7 @@ module register_file
 			ecall_state <= ECALL_IDLE;
 		end else begin
 			if(next_ecall_state == ECALL_IN_PROGRESS) begin
-				$display("DOING ECALLL!!!!");
+				// $display("DOING ECALLL!!!!");
 				do_ecall(registers[17], registers[10], registers[11], registers[12], registers[13], registers[14], registers[15], registers[16], registers[10]);
 				ecall_state <= ECALL_DONE;
 			end else begin

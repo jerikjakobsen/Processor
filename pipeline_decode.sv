@@ -69,11 +69,11 @@ module pipeline_decode
     next_stage_pc = instruction_pc;
   end
 
-  // always_ff @ (posedge clk) begin
-  //   if(ecall) begin
-  //     $display("ECALL at: %x", instruction_pc);
-  //   end
-  // end
+  always_ff @ (posedge clk) begin
+    if(ecall) begin
+      // $display("ECALL at: %x", instruction_pc);
+    end
+  end
 
   always_comb begin
     ecall = 0;
@@ -473,6 +473,15 @@ module pipeline_decode
           r2_reg = 0;
         end
 
+        7'b0001111: begin
+          // FENCE
+          dst_reg = 0;
+          ex_opcode = NOP;
+          mem_opcode = 4;
+          r1_reg = 0;
+          r2_reg = 0;
+        end
+
         default: begin
           dst_reg = 0;
           ex_opcode = NOP;
@@ -481,7 +490,7 @@ module pipeline_decode
           r2_reg = 0;
           if(instruction_pc != 0) begin
             $display("UNKNOWN INSTRUCTION at PC: %h: %h", instruction_pc, instruction);
-            // $finish();
+            $finish();
           end
         end
       endcase

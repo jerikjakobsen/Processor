@@ -48,7 +48,7 @@ module pipeline_memory
   logic tmp_signal, tmp2_signal;
 
   assign tmp_signal = S_R_ADDR == 63'h841A0;
-  assign tmp2_signal = S_W_DATA == 63'h28;
+  assign tmp2_signal = S_W_ADDR == 63'h3fbffe68;
 
   always_ff  @ (posedge clk) begin
     if(reset) begin
@@ -63,25 +63,25 @@ module pipeline_memory
       
       // case(mem_operation_size)
       //   BYTE: begin
-      //     do_pending_write(ex_res, r2_val, 1);
+      //     do_pending_write(ex_res, r2_val[7:0], 1);
       //   end
       //   HALF_WORD: begin
-      //     do_pending_write(ex_res, r2_val, 2);
+      //     do_pending_write(ex_res, r2_val[15:0], 2);
       //   end
       //   WORD: begin
-      //     do_pending_write(ex_res, r2_val, 4);
+      //     do_pending_write(ex_res, r2_val[31:0], 4);
       //   end
       //   DOUBLE_WORD: begin
-      //     do_pending_write(ex_res, r2_val, 8);
+      //     do_pending_write(ex_res, r2_val[63:0], 8);
       //   end
       //   UNSIGNED_WORD: begin
-      //     do_pending_write(ex_res, r2_val, 4);
+      //     do_pending_write(ex_res, r2_val[31:0], 4);
       //   end
       //   UNSIGNED_HALF_WORD: begin
-      //     do_pending_write(ex_res, r2_val, 2);
+      //     do_pending_write(ex_res, r2_val[15:0], 2);
       //   end
       //   UNSIGNED_BYTE: begin
-      //     do_pending_write(ex_res, r2_val, 1);
+      //     do_pending_write(ex_res, r2_val[7:0], 1);
       //   end
       // endcase
     end

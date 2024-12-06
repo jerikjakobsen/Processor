@@ -74,19 +74,19 @@ void Vtop::_initial__TOP__1(Vtop__Syms* __restrict vlSymsp) {
     VL_DEBUG_IF(VL_PRINTF("    Vtop::_initial__TOP__1\n"); );
     Vtop* __restrict vlTOPp VL_ATTR_UNUSED = vlSymsp->TOPp;
     // Body
-    // INITIAL at top.sv:148
-    vlTOPp->m_axi_arburst = 2U;
     // INITIAL at top.sv:149
-    vlTOPp->m_axi_awburst = 1U;
+    vlTOPp->m_axi_arburst = 2U;
     // INITIAL at top.sv:150
-    vlTOPp->m_axi_arsize = 3U;
+    vlTOPp->m_axi_awburst = 1U;
     // INITIAL at top.sv:151
-    vlTOPp->m_axi_awsize = 3U;
+    vlTOPp->m_axi_arsize = 3U;
     // INITIAL at top.sv:152
-    vlTOPp->m_axi_arlen = 7U;
+    vlTOPp->m_axi_awsize = 3U;
     // INITIAL at top.sv:153
+    vlTOPp->m_axi_arlen = 7U;
+    // INITIAL at top.sv:154
     vlTOPp->m_axi_awlen = 7U;
-    // INITIAL at top.sv:485
+    // INITIAL at top.sv:486
     VL_WRITEF("Initializing top, entry point = 0x%x\n",
 	      64,vlTOPp->entry);
 }
@@ -7114,7 +7114,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 	    vlTOPp->top__DOT__L2_S_R_ADDR_VALID_D = 1U;
 	}
     }
-    // ALWAYS at top.sv:354
+    // ALWAYS at top.sv:355
     if (vlTOPp->reset) {
 	vlTOPp->top__DOT__pc = vlTOPp->entry;
 	vlTOPp->m_axi_acready = 1U;
@@ -7271,8 +7271,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
     if (vlTOPp->reset) {
 	vlTOPp->top__DOT__rf__DOT__ecall_state = 0U;
     } else {
-	if (VL_UNLIKELY((1U == (IData)(vlTOPp->top__DOT__rf__DOT__next_ecall_state)))) {
-	    VL_WRITEF("DOING ECALLL!!!!\n");
+	if ((1U == (IData)(vlTOPp->top__DOT__rf__DOT__next_ecall_state))) {
 	    // Function: do_ecall at register_file.sv:33
 	    vlSymsp->TOP____024unit.__Vdpiimwrap_do_ecall_TOP____024unit(
 									 vlTOPp->top__DOT__rf__DOT__registers
@@ -7291,9 +7290,9 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 									 [0xfU], 
 									 vlTOPp->top__DOT__rf__DOT__registers
 									 [0x10U], __Vtask_do_ecall__0__a0ret);
-	    vlTOPp->top__DOT__rf__DOT__ecall_state = 2U;
 	    vlTOPp->top__DOT__rf__DOT__registers[0xaU] 
 		= __Vtask_do_ecall__0__a0ret;
+	    vlTOPp->top__DOT__rf__DOT__ecall_state = 2U;
 	} else {
 	    vlTOPp->top__DOT__rf__DOT__ecall_state 
 		= vlTOPp->top__DOT__rf__DOT__next_ecall_state;
@@ -7333,7 +7332,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 			    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 				      64,vlTOPp->top__DOT__id_instr_pc,
 				      32,vlTOPp->top__DOT__instruction);
-			    vl_finish("pipeline_decode.sv",484,"");
+			    vl_finish("pipeline_decode.sv",493,"");
 			}
 		    } else {
 			if ((4U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
@@ -7342,7 +7341,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7367,7 +7366,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7381,7 +7380,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7458,7 +7457,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7472,7 +7471,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7486,7 +7485,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7530,7 +7529,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7544,7 +7543,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7655,7 +7654,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7669,7 +7668,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7685,7 +7684,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 		    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 			      64,vlTOPp->top__DOT__id_instr_pc,
 			      32,vlTOPp->top__DOT__instruction);
-		    vl_finish("pipeline_decode.sv",484,"");
+		    vl_finish("pipeline_decode.sv",493,"");
 		}
 		vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 		vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7703,7 +7702,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7811,7 +7810,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7825,7 +7824,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7866,7 +7865,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -7880,7 +7879,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8028,7 +8027,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8042,7 +8041,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8059,7 +8058,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 			    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 				      64,vlTOPp->top__DOT__id_instr_pc,
 				      32,vlTOPp->top__DOT__instruction);
-			    vl_finish("pipeline_decode.sv",484,"");
+			    vl_finish("pipeline_decode.sv",493,"");
 			}
 			vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8073,7 +8072,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8139,7 +8138,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8153,7 +8152,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8173,7 +8172,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8265,7 +8264,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8279,7 +8278,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8320,7 +8319,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8334,7 +8333,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8505,7 +8504,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8519,7 +8518,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8531,18 +8530,59 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 		    }
 		} else {
 		    if ((8U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
-			if (VL_UNLIKELY((VL_ULL(0) 
-					 != vlTOPp->top__DOT__id_instr_pc))) {
-			    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
-				      64,vlTOPp->top__DOT__id_instr_pc,
-				      32,vlTOPp->top__DOT__instruction);
-			    vl_finish("pipeline_decode.sv",484,"");
+			if ((4U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
+			    if ((2U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
+				if ((1U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
+				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
+				    vlTOPp->top__DOT__next_ex_opcode = 0U;
+				    vlTOPp->top__DOT__next_mem_opcode_ex = 4U;
+				    vlTOPp->top__DOT__rf_reg1 = 0U;
+				    vlTOPp->top__DOT__rf_reg2 = 0U;
+				} else {
+				    if (VL_UNLIKELY(
+						    (VL_ULL(0) 
+						     != vlTOPp->top__DOT__id_instr_pc))) {
+					VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
+						  64,
+						  vlTOPp->top__DOT__id_instr_pc,
+						  32,
+						  vlTOPp->top__DOT__instruction);
+					vl_finish("pipeline_decode.sv",493,"");
+				    }
+				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
+				    vlTOPp->top__DOT__next_ex_opcode = 0U;
+				    vlTOPp->top__DOT__next_mem_opcode_ex = 0U;
+				    vlTOPp->top__DOT__rf_reg1 = 0U;
+				    vlTOPp->top__DOT__rf_reg2 = 0U;
+				}
+			    } else {
+				if (VL_UNLIKELY((VL_ULL(0) 
+						 != vlTOPp->top__DOT__id_instr_pc))) {
+				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
+					      64,vlTOPp->top__DOT__id_instr_pc,
+					      32,vlTOPp->top__DOT__instruction);
+				    vl_finish("pipeline_decode.sv",493,"");
+				}
+				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
+				vlTOPp->top__DOT__next_ex_opcode = 0U;
+				vlTOPp->top__DOT__next_mem_opcode_ex = 0U;
+				vlTOPp->top__DOT__rf_reg1 = 0U;
+				vlTOPp->top__DOT__rf_reg2 = 0U;
+			    }
+			} else {
+			    if (VL_UNLIKELY((VL_ULL(0) 
+					     != vlTOPp->top__DOT__id_instr_pc))) {
+				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
+					  64,vlTOPp->top__DOT__id_instr_pc,
+					  32,vlTOPp->top__DOT__instruction);
+				vl_finish("pipeline_decode.sv",493,"");
+			    }
+			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
+			    vlTOPp->top__DOT__next_ex_opcode = 0U;
+			    vlTOPp->top__DOT__next_mem_opcode_ex = 0U;
+			    vlTOPp->top__DOT__rf_reg1 = 0U;
+			    vlTOPp->top__DOT__rf_reg2 = 0U;
 			}
-			vlTOPp->top__DOT__next_ex_dst_reg = 0U;
-			vlTOPp->top__DOT__next_ex_opcode = 0U;
-			vlTOPp->top__DOT__next_mem_opcode_ex = 0U;
-			vlTOPp->top__DOT__rf_reg1 = 0U;
-			vlTOPp->top__DOT__rf_reg2 = 0U;
 		    } else {
 			if ((4U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
 			    if (VL_UNLIKELY((VL_ULL(0) 
@@ -8550,7 +8590,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8631,7 +8671,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -8645,7 +8685,7 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -9845,7 +9885,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 			    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 				      64,vlTOPp->top__DOT__id_instr_pc,
 				      32,vlTOPp->top__DOT__instruction);
-			    vl_finish("pipeline_decode.sv",484,"");
+			    vl_finish("pipeline_decode.sv",493,"");
 			}
 		    } else {
 			if ((4U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
@@ -9854,7 +9894,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -9879,7 +9919,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -9893,7 +9933,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -9970,7 +10010,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -9984,7 +10024,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -9998,7 +10038,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10042,7 +10082,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10056,7 +10096,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10167,7 +10207,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10181,7 +10221,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10197,7 +10237,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 		    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 			      64,vlTOPp->top__DOT__id_instr_pc,
 			      32,vlTOPp->top__DOT__instruction);
-		    vl_finish("pipeline_decode.sv",484,"");
+		    vl_finish("pipeline_decode.sv",493,"");
 		}
 		vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 		vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10215,7 +10255,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10323,7 +10363,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10337,7 +10377,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10378,7 +10418,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10392,7 +10432,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10540,7 +10580,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10554,7 +10594,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10571,7 +10611,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 			    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 				      64,vlTOPp->top__DOT__id_instr_pc,
 				      32,vlTOPp->top__DOT__instruction);
-			    vl_finish("pipeline_decode.sv",484,"");
+			    vl_finish("pipeline_decode.sv",493,"");
 			}
 			vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10585,7 +10625,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10651,7 +10691,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10665,7 +10705,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10685,7 +10725,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10777,7 +10817,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10791,7 +10831,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10832,7 +10872,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -10846,7 +10886,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -11017,7 +11057,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -11031,7 +11071,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -11043,18 +11083,59 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 		    }
 		} else {
 		    if ((8U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
-			if (VL_UNLIKELY((VL_ULL(0) 
-					 != vlTOPp->top__DOT__id_instr_pc))) {
-			    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
-				      64,vlTOPp->top__DOT__id_instr_pc,
-				      32,vlTOPp->top__DOT__instruction);
-			    vl_finish("pipeline_decode.sv",484,"");
+			if ((4U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
+			    if ((2U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
+				if ((1U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
+				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
+				    vlTOPp->top__DOT__next_ex_opcode = 0U;
+				    vlTOPp->top__DOT__next_mem_opcode_ex = 4U;
+				    vlTOPp->top__DOT__rf_reg1 = 0U;
+				    vlTOPp->top__DOT__rf_reg2 = 0U;
+				} else {
+				    if (VL_UNLIKELY(
+						    (VL_ULL(0) 
+						     != vlTOPp->top__DOT__id_instr_pc))) {
+					VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
+						  64,
+						  vlTOPp->top__DOT__id_instr_pc,
+						  32,
+						  vlTOPp->top__DOT__instruction);
+					vl_finish("pipeline_decode.sv",493,"");
+				    }
+				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
+				    vlTOPp->top__DOT__next_ex_opcode = 0U;
+				    vlTOPp->top__DOT__next_mem_opcode_ex = 0U;
+				    vlTOPp->top__DOT__rf_reg1 = 0U;
+				    vlTOPp->top__DOT__rf_reg2 = 0U;
+				}
+			    } else {
+				if (VL_UNLIKELY((VL_ULL(0) 
+						 != vlTOPp->top__DOT__id_instr_pc))) {
+				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
+					      64,vlTOPp->top__DOT__id_instr_pc,
+					      32,vlTOPp->top__DOT__instruction);
+				    vl_finish("pipeline_decode.sv",493,"");
+				}
+				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
+				vlTOPp->top__DOT__next_ex_opcode = 0U;
+				vlTOPp->top__DOT__next_mem_opcode_ex = 0U;
+				vlTOPp->top__DOT__rf_reg1 = 0U;
+				vlTOPp->top__DOT__rf_reg2 = 0U;
+			    }
+			} else {
+			    if (VL_UNLIKELY((VL_ULL(0) 
+					     != vlTOPp->top__DOT__id_instr_pc))) {
+				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
+					  64,vlTOPp->top__DOT__id_instr_pc,
+					  32,vlTOPp->top__DOT__instruction);
+				vl_finish("pipeline_decode.sv",493,"");
+			    }
+			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
+			    vlTOPp->top__DOT__next_ex_opcode = 0U;
+			    vlTOPp->top__DOT__next_mem_opcode_ex = 0U;
+			    vlTOPp->top__DOT__rf_reg1 = 0U;
+			    vlTOPp->top__DOT__rf_reg2 = 0U;
 			}
-			vlTOPp->top__DOT__next_ex_dst_reg = 0U;
-			vlTOPp->top__DOT__next_ex_opcode = 0U;
-			vlTOPp->top__DOT__next_mem_opcode_ex = 0U;
-			vlTOPp->top__DOT__rf_reg1 = 0U;
-			vlTOPp->top__DOT__rf_reg2 = 0U;
 		    } else {
 			if ((4U & (IData)(vlTOPp->top__DOT__id_stage__DOT__opcode))) {
 			    if (VL_UNLIKELY((VL_ULL(0) 
@@ -11062,7 +11143,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					  64,vlTOPp->top__DOT__id_instr_pc,
 					  32,vlTOPp->top__DOT__instruction);
-				vl_finish("pipeline_decode.sv",484,"");
+				vl_finish("pipeline_decode.sv",493,"");
 			    }
 			    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 			    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -11143,7 +11224,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						  vlTOPp->top__DOT__id_instr_pc,
 						  32,
 						  vlTOPp->top__DOT__instruction);
-					vl_finish("pipeline_decode.sv",484,"");
+					vl_finish("pipeline_decode.sv",493,"");
 				    }
 				    vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				    vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -11157,7 +11238,7 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 				    VL_WRITEF("UNKNOWN INSTRUCTION at PC: %x: %x\n",
 					      64,vlTOPp->top__DOT__id_instr_pc,
 					      32,vlTOPp->top__DOT__instruction);
-				    vl_finish("pipeline_decode.sv",484,"");
+				    vl_finish("pipeline_decode.sv",493,"");
 				}
 				vlTOPp->top__DOT__next_ex_dst_reg = 0U;
 				vlTOPp->top__DOT__next_ex_opcode = 0U;
@@ -13409,10 +13490,14 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 			    } else {
 				vlTOPp->top__DOT__jump_signal = 0U;
 				vlTOPp->top__DOT__next_ex_res 
-				    = ((vlTOPp->top__DOT__r1_val 
-					< vlTOPp->top__DOT__imm)
-				        ? VL_ULL(1)
-				        : VL_ULL(0));
+				    = ((1U == (IData)(vlTOPp->top__DOT__unsigned_op))
+				        ? ((vlTOPp->top__DOT__r1_val 
+					    < vlTOPp->top__DOT__ex_stage__DOT__operand2)
+					    ? VL_ULL(1)
+					    : VL_ULL(0))
+				        : (VL_LTS_IQQ(1,64,64, vlTOPp->top__DOT__r1_val, vlTOPp->top__DOT__ex_stage__DOT__operand2)
+					    ? VL_ULL(1)
+					    : VL_ULL(0)));
 			    }
 			}
 		    } else {
@@ -13427,8 +13512,21 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 							       >> vlTOPp->top__DOT__ex_stage__DOT__operand2)));
 				    } else {
 					vlTOPp->top__DOT__ex_stage__DOT__temp_result 
-					    = ((QData)((IData)(vlTOPp->top__DOT__r1_val)) 
-					       >> vlTOPp->top__DOT__ex_stage__DOT__operand2);
+					    = ((1U 
+						& (IData)(
+							  (vlTOPp->top__DOT__r1_val 
+							   >> 0x3fU)))
+					        ? (
+						   ((QData)((IData)(vlTOPp->top__DOT__r1_val)) 
+						    >> vlTOPp->top__DOT__ex_stage__DOT__operand2) 
+						   | (~ 
+						      ((VL_ULL(1) 
+							<< 
+							(VL_ULL(0x40) 
+							 - vlTOPp->top__DOT__ex_stage__DOT__operand2)) 
+						       - VL_ULL(1))))
+					        : ((QData)((IData)(vlTOPp->top__DOT__r1_val)) 
+						   >> vlTOPp->top__DOT__ex_stage__DOT__operand2));
 					vlTOPp->top__DOT__next_ex_res 
 					    = VL_EXTENDS_QI(64,32, (IData)(vlTOPp->top__DOT__ex_stage__DOT__temp_result));
 				    }
@@ -13437,8 +13535,21 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 					= ((1U == (IData)(vlTOPp->top__DOT__unsigned_op))
 					    ? (vlTOPp->top__DOT__r1_val 
 					       >> vlTOPp->top__DOT__ex_stage__DOT__operand2)
-					    : (vlTOPp->top__DOT__r1_val 
-					       >> vlTOPp->top__DOT__ex_stage__DOT__operand2));
+					    : ((1U 
+						& (IData)(
+							  (vlTOPp->top__DOT__r1_val 
+							   >> 0x3fU)))
+					        ? (
+						   (vlTOPp->top__DOT__r1_val 
+						    >> vlTOPp->top__DOT__ex_stage__DOT__operand2) 
+						   | (~ 
+						      ((VL_ULL(1) 
+							<< 
+							(VL_ULL(0x40) 
+							 - vlTOPp->top__DOT__ex_stage__DOT__operand2)) 
+						       - VL_ULL(1))))
+					        : (vlTOPp->top__DOT__r1_val 
+						   >> vlTOPp->top__DOT__ex_stage__DOT__operand2)));
 				}
 			    } else {
 				vlTOPp->top__DOT__jump_signal = 0U;
@@ -16497,10 +16608,14 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 			    } else {
 				vlTOPp->top__DOT__jump_signal = 0U;
 				vlTOPp->top__DOT__next_ex_res 
-				    = ((vlTOPp->top__DOT__r1_val 
-					< vlTOPp->top__DOT__imm)
-				        ? VL_ULL(1)
-				        : VL_ULL(0));
+				    = ((1U == (IData)(vlTOPp->top__DOT__unsigned_op))
+				        ? ((vlTOPp->top__DOT__r1_val 
+					    < vlTOPp->top__DOT__ex_stage__DOT__operand2)
+					    ? VL_ULL(1)
+					    : VL_ULL(0))
+				        : (VL_LTS_IQQ(1,64,64, vlTOPp->top__DOT__r1_val, vlTOPp->top__DOT__ex_stage__DOT__operand2)
+					    ? VL_ULL(1)
+					    : VL_ULL(0)));
 			    }
 			}
 		    } else {
@@ -16515,8 +16630,21 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 							       >> vlTOPp->top__DOT__ex_stage__DOT__operand2)));
 				    } else {
 					vlTOPp->top__DOT__ex_stage__DOT__temp_result 
-					    = ((QData)((IData)(vlTOPp->top__DOT__r1_val)) 
-					       >> vlTOPp->top__DOT__ex_stage__DOT__operand2);
+					    = ((1U 
+						& (IData)(
+							  (vlTOPp->top__DOT__r1_val 
+							   >> 0x3fU)))
+					        ? (
+						   ((QData)((IData)(vlTOPp->top__DOT__r1_val)) 
+						    >> vlTOPp->top__DOT__ex_stage__DOT__operand2) 
+						   | (~ 
+						      ((VL_ULL(1) 
+							<< 
+							(VL_ULL(0x40) 
+							 - vlTOPp->top__DOT__ex_stage__DOT__operand2)) 
+						       - VL_ULL(1))))
+					        : ((QData)((IData)(vlTOPp->top__DOT__r1_val)) 
+						   >> vlTOPp->top__DOT__ex_stage__DOT__operand2));
 					vlTOPp->top__DOT__next_ex_res 
 					    = VL_EXTENDS_QI(64,32, (IData)(vlTOPp->top__DOT__ex_stage__DOT__temp_result));
 				    }
@@ -16525,8 +16653,21 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 					= ((1U == (IData)(vlTOPp->top__DOT__unsigned_op))
 					    ? (vlTOPp->top__DOT__r1_val 
 					       >> vlTOPp->top__DOT__ex_stage__DOT__operand2)
-					    : (vlTOPp->top__DOT__r1_val 
-					       >> vlTOPp->top__DOT__ex_stage__DOT__operand2));
+					    : ((1U 
+						& (IData)(
+							  (vlTOPp->top__DOT__r1_val 
+							   >> 0x3fU)))
+					        ? (
+						   (vlTOPp->top__DOT__r1_val 
+						    >> vlTOPp->top__DOT__ex_stage__DOT__operand2) 
+						   | (~ 
+						      ((VL_ULL(1) 
+							<< 
+							(VL_ULL(0x40) 
+							 - vlTOPp->top__DOT__ex_stage__DOT__operand2)) 
+						       - VL_ULL(1))))
+					        : (vlTOPp->top__DOT__r1_val 
+						   >> vlTOPp->top__DOT__ex_stage__DOT__operand2)));
 				}
 			    } else {
 				vlTOPp->top__DOT__jump_signal = 0U;
@@ -18305,18 +18446,30 @@ void Vtop::_settle__TOP__6(Vtop__Syms* __restrict vlSymsp) {
     }
     if ((0U == (IData)(vlTOPp->top__DOT__llc__DOT__state))) {
 	vlTOPp->top__DOT__L2_S_W_COMPLETE = 0U;
-	if (((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
-						 == (IData)(vlTOPp->m_axi_acsnoop))) 
-	      & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
-					 + ((IData)(0x236U) 
-					    * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))) 
-		 & (vlTOPp->top__DOT__llc__DOT__cache[
-		    (0x7ffU & (((IData)(0x35U) + ((IData)(0x236U) 
-						  * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))) 
-			       >> 5U))] >> (0x1fU & 
-					    ((IData)(0x35U) 
-					     + ((IData)(0x236U) 
-						* (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))))) 
+	if ((((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
+						  == (IData)(vlTOPp->m_axi_acsnoop))) 
+	       & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
+					  + ((IData)(0x236U) 
+					     * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))) 
+		  & (vlTOPp->top__DOT__llc__DOT__cache[
+		     (0x7ffU & (((IData)(0x35U) + ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))) 
+				>> 5U))] >> (0x1fU 
+					     & ((IData)(0x35U) 
+						+ ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))))) 
+	      & (~ ((0x8d7fU >= (0xffffU & ((IData)(0x34U) 
+					    + ((IData)(0x236U) 
+					       * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))) 
+		    & (vlTOPp->top__DOT__llc__DOT__cache[
+		       (0x7ffU & (((IData)(0x34U) + 
+				   ((IData)(0x236U) 
+				    * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))) 
+				  >> 5U))] >> (0x1fU 
+					       & ((IData)(0x34U) 
+						  + 
+						  ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index)))))))) 
 	     & ((VL_ULL(0xfffffffffffff) & ((0x8d7fU 
 					     >= (0xffffU 
 						 & ((IData)(0x236U) 
@@ -21208,18 +21361,30 @@ void Vtop::_settle__TOP__6(Vtop__Syms* __restrict vlSymsp) {
     }
     if ((0U == (IData)(vlTOPp->top__DOT__l1_d__DOT__state))) {
 	vlTOPp->top__DOT__L1_D_S_W_COMPLETE = 0U;
-	if (((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
-						 == (IData)(vlTOPp->m_axi_acsnoop))) 
-	      & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
-					 + ((IData)(0x236U) 
-					    * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))) 
-		 & (vlTOPp->top__DOT__l1_d__DOT__cache[
-		    (0x7ffU & (((IData)(0x35U) + ((IData)(0x236U) 
-						  * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))) 
-			       >> 5U))] >> (0x1fU & 
-					    ((IData)(0x35U) 
-					     + ((IData)(0x236U) 
-						* (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))))) 
+	if ((((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
+						  == (IData)(vlTOPp->m_axi_acsnoop))) 
+	       & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
+					  + ((IData)(0x236U) 
+					     * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))) 
+		  & (vlTOPp->top__DOT__l1_d__DOT__cache[
+		     (0x7ffU & (((IData)(0x35U) + ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))) 
+				>> 5U))] >> (0x1fU 
+					     & ((IData)(0x35U) 
+						+ ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))))) 
+	      & (~ ((0x8d7fU >= (0xffffU & ((IData)(0x34U) 
+					    + ((IData)(0x236U) 
+					       * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))) 
+		    & (vlTOPp->top__DOT__l1_d__DOT__cache[
+		       (0x7ffU & (((IData)(0x34U) + 
+				   ((IData)(0x236U) 
+				    * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))) 
+				  >> 5U))] >> (0x1fU 
+					       & ((IData)(0x34U) 
+						  + 
+						  ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index)))))))) 
 	     & ((VL_ULL(0xfffffffffffff) & ((0x8d7fU 
 					     >= (0xffffU 
 						 & ((IData)(0x236U) 
@@ -23899,18 +24064,30 @@ VL_INLINE_OPT void Vtop::_combo__TOP__7(Vtop__Syms* __restrict vlSymsp) {
     }
     if ((0U == (IData)(vlTOPp->top__DOT__llc__DOT__state))) {
 	vlTOPp->top__DOT__L2_S_W_COMPLETE = 0U;
-	if (((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
-						 == (IData)(vlTOPp->m_axi_acsnoop))) 
-	      & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
-					 + ((IData)(0x236U) 
-					    * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))) 
-		 & (vlTOPp->top__DOT__llc__DOT__cache[
-		    (0x7ffU & (((IData)(0x35U) + ((IData)(0x236U) 
-						  * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))) 
-			       >> 5U))] >> (0x1fU & 
-					    ((IData)(0x35U) 
-					     + ((IData)(0x236U) 
-						* (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))))) 
+	if ((((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
+						  == (IData)(vlTOPp->m_axi_acsnoop))) 
+	       & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
+					  + ((IData)(0x236U) 
+					     * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))) 
+		  & (vlTOPp->top__DOT__llc__DOT__cache[
+		     (0x7ffU & (((IData)(0x35U) + ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))) 
+				>> 5U))] >> (0x1fU 
+					     & ((IData)(0x35U) 
+						+ ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))))) 
+	      & (~ ((0x8d7fU >= (0xffffU & ((IData)(0x34U) 
+					    + ((IData)(0x236U) 
+					       * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))))) 
+		    & (vlTOPp->top__DOT__llc__DOT__cache[
+		       (0x7ffU & (((IData)(0x34U) + 
+				   ((IData)(0x236U) 
+				    * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index))) 
+				  >> 5U))] >> (0x1fU 
+					       & ((IData)(0x34U) 
+						  + 
+						  ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__llc__DOT__ac_addr_requested_index)))))))) 
 	     & ((VL_ULL(0xfffffffffffff) & ((0x8d7fU 
 					     >= (0xffffU 
 						 & ((IData)(0x236U) 
@@ -26746,18 +26923,30 @@ VL_INLINE_OPT void Vtop::_combo__TOP__7(Vtop__Syms* __restrict vlSymsp) {
     }
     if ((0U == (IData)(vlTOPp->top__DOT__l1_d__DOT__state))) {
 	vlTOPp->top__DOT__L1_D_S_W_COMPLETE = 0U;
-	if (((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
-						 == (IData)(vlTOPp->m_axi_acsnoop))) 
-	      & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
-					 + ((IData)(0x236U) 
-					    * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))) 
-		 & (vlTOPp->top__DOT__l1_d__DOT__cache[
-		    (0x7ffU & (((IData)(0x35U) + ((IData)(0x236U) 
-						  * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))) 
-			       >> 5U))] >> (0x1fU & 
-					    ((IData)(0x35U) 
-					     + ((IData)(0x236U) 
-						* (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))))) 
+	if ((((((IData)(vlTOPp->m_axi_acvalid) & (0xdU 
+						  == (IData)(vlTOPp->m_axi_acsnoop))) 
+	       & ((0x8d7fU >= (0xffffU & ((IData)(0x35U) 
+					  + ((IData)(0x236U) 
+					     * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))) 
+		  & (vlTOPp->top__DOT__l1_d__DOT__cache[
+		     (0x7ffU & (((IData)(0x35U) + ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))) 
+				>> 5U))] >> (0x1fU 
+					     & ((IData)(0x35U) 
+						+ ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))))) 
+	      & (~ ((0x8d7fU >= (0xffffU & ((IData)(0x34U) 
+					    + ((IData)(0x236U) 
+					       * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))))) 
+		    & (vlTOPp->top__DOT__l1_d__DOT__cache[
+		       (0x7ffU & (((IData)(0x34U) + 
+				   ((IData)(0x236U) 
+				    * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index))) 
+				  >> 5U))] >> (0x1fU 
+					       & ((IData)(0x34U) 
+						  + 
+						  ((IData)(0x236U) 
+						   * (IData)(vlTOPp->top__DOT__l1_d__DOT__ac_addr_requested_index)))))))) 
 	     & ((VL_ULL(0xfffffffffffff) & ((0x8d7fU 
 					     >= (0xffffU 
 						 & ((IData)(0x236U) 

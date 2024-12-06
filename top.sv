@@ -141,9 +141,10 @@ module top
 
   logic ex_raw_dep, mem_raw_dep;
 
-  logic tmp_signal;
+  logic tmp_signal, tmp3_signal;
 
-  assign tmp_signal = pc == 63'h22f40; // 63'h22fac;// 63'h22f9c; // 63'h22f40; // 63'h1e730;
+  assign tmp_signal = pc == 63'h296ac; // 63'h22fac;// 63'h22f9c; // 63'h22f40; // 63'h1e730;
+  assign tmp3_signal = m_axi_acaddr == 63'h3fbffe68;
 
   assign m_axi_arburst = 2'b10;
   assign m_axi_awburst = 2'b01;

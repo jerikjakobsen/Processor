@@ -1,6 +1,7 @@
 .PHONY: all run clean submit
 
 PROG=/shared/cse502/tests/project/prog1
+# PROG=/home/kuchadha/cse_502_cpu/tests/test1.o
 # PROG=/shared/cse502/tests/wp1/prog1.o
 # PROG=/shared/cse502/tests/wp1/prog1.o
 #PROG=/shared/cse502/tests/bbl.bin

@@ -193,7 +193,7 @@ always_comb begin
     case (state) 
         IDLE: begin
             S_W_COMPLETE = 0;
-            if(m_axi_acvalid && m_axi_acsnoop == 63'hD && cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
+            if(m_axi_acvalid && m_axi_acsnoop == 63'hD && cache[ac_addr_requested_index].state[1] && !cache[ac_addr_requested_index].state[0] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
                 next_cache[ac_addr_requested_index].state[1] = 0;
             end else begin
                 if (S_R_ADDR_VALID && (r_requested_tag != r_selected_tag || !r_selected_block_is_valid)) begin
