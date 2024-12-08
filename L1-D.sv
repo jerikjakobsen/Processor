@@ -197,11 +197,11 @@ always_comb begin
         IDLE: begin
             S_W_COMPLETE = 0;
             if(m_axi_acvalid && m_axi_acsnoop == 63'hD) begin
-                // if (cache[ac_addr_requested_index].ways[0].valid && !cache[ac_addr_requested_index].ways[0].dirty && cache[ac_addr_requested_index].ways[0].tag == ac_addr_requested_tag) begin
-                //     next_cache[ac_addr_requested_index].ways[0].valid = 0;
-                // end else if (cache[ac_addr_requested_index].ways[1].valid && !cache[ac_addr_requested_index].ways[1].dirty && cache[ac_addr_requested_index].ways[1].tag == ac_addr_requested_tag) begin
-                //     next_cache[ac_addr_requested_index].ways[1].valid = 0;
-                // end
+                if (cache[ac_addr_requested_index].ways[0].valid && !cache[ac_addr_requested_index].ways[0].dirty && cache[ac_addr_requested_index].ways[0].tag == ac_addr_requested_tag) begin
+                    next_cache[ac_addr_requested_index].ways[0].valid = 0;
+                end else if (cache[ac_addr_requested_index].ways[1].valid && !cache[ac_addr_requested_index].ways[1].dirty && cache[ac_addr_requested_index].ways[1].tag == ac_addr_requested_tag) begin
+                    next_cache[ac_addr_requested_index].ways[1].valid = 0;
+                end
             end else begin
                 if (
                     S_R_ADDR_VALID &&
