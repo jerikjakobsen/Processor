@@ -83,7 +83,6 @@ module L1_D #(
 
     typedef struct packed {
         logic [DATA_SIZE-1:0] data;       // Data section (e.g., 512 bits)
-        logic [1:0] state;               // State section (e.g., 2 bits for valid/dirty) REMOVE
         logic dirty;
         logic valid;
         logic [TAG_SIZE-1:0] tag;
@@ -130,19 +129,12 @@ module L1_D #(
       r_requested_index = S_R_ADDR[`ADDRESS_INDEX_SLICE]; // Combinatorial access to requested address for read
       r_requested_offset = S_R_ADDR[`ADDRESS_OFFSET_SLICE];
 
-    //   r_selected_data = cache[r_requested_index].data; // Combinatorial access to cache values based on requested address for read
-    //   r_selected_block_is_valid = cache[r_requested_index].valid; // Combinatorial access to cache values based on requested address for read
-    //   r_selected_block_is_dirty = cache[r_requested_index].dirty;
-    //   r_selected_tag = cache[r_requested_index].tag; // Combinatorial access to cache values based on requested address for read
-
       latched_r_requested_tag = latched_r_requested_address[`ADDRESS_TAG_SLICE]; // Combinatorial access to latched address for read
       latched_r_requested_index = latched_r_requested_address[`ADDRESS_INDEX_SLICE]; // Combinatorial access to latched address for read
 
         ac_addr_requested_tag = m_axi_acaddr[`ADDRESS_TAG_SLICE];
         ac_addr_requested_index = m_axi_acaddr[`ADDRESS_INDEX_SLICE];
 
-    //   S_R_DATA = r_selected_data[(r_requested_offset + 8)*8-1 -:64]; // r_selected_data[(r_requested_offset + 8)*8-1 -:64];
-    //   S_R_DATA_VALID = S_R_ADDR_VALID && (r_selected_tag == r_requested_tag && r_selected_block_is_valid);
         if (cache[r_requested_index].ways[0].tag == r_requested_tag && cache[r_requested_index].ways[0].valid) begin
             S_R_DATA = cache[r_requested_index].ways[0].data[(r_requested_offset + 8)*8-1 -:64];
             S_R_DATA_VALID = 1;
@@ -153,19 +145,10 @@ module L1_D #(
             S_R_DATA_VALID = 0;
             S_R_DATA = 0;
         end
+
       // Write Signals
       w_requested_tag = S_W_ADDR[`ADDRESS_TAG_SLICE];
       w_requested_index = S_W_ADDR[`ADDRESS_INDEX_SLICE];
-
-    //   w_selected_data = cache[w_requested_index].data;
-    //   w_selected_tag = cache[w_requested_index].tag;
-    //   w_selected_block_is_valid = cache[w_requested_index].valid;
-    //   w_selected_block_is_dirty = cache[w_requested_index].dirty;
-
-    //   latched_w_selected_data = cache[latched_w_requested_index].data;
-    //   latched_w_selected_tag = cache[latched_w_requested_index].tag;
-
-    //   conflicting_tags = r_requested_tag != r_selected_tag;
 
       S_W_READY = !latched_s_w_contains_request;
     end
@@ -290,7 +273,7 @@ always_comb begin
                             next_r_state = L2_R_REQUEST;
                             next_latched_r_requested_address = latched_s_w_request_addr;
                             if (
-                                (cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].ways[0].dirty && cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].ways[0].valid) ||
+                                (cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].ways[0].dirty && cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].ways[0].valid) &&
                                 (cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].ways[1].dirty && cache[latched_s_w_request_addr[`ADDRESS_INDEX_SLICE]].ways[1].valid)
                             ) begin // Both blocks dirty, choose one to evict
 
@@ -436,7 +419,7 @@ always_comb begin
     case (r_state)
         L2_R_REQUEST: begin
             if (L2_S_R_DATA_VALID) begin
-                if (!cache[latched_r_requested_index].ways[0].valid) begin
+                if (!cache[latched_r_requested_index].ways[0].valid || !cache[latched_r_requested_index].ways[0].dirty) begin
                     next_cache[latched_r_requested_index].ways[0].data = L2_S_R_DATA;
                     next_cache[latched_r_requested_index].ways[0].valid = 1;
                     next_cache[latched_r_requested_index].ways[0].dirty = 0;
