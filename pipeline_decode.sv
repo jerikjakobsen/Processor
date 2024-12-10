@@ -58,9 +58,9 @@ module pipeline_decode
             HALF_WORD  = 3'd1,
             WORD = 3'd2,
             DOUBLE_WORD = 3'd3,
-            UNSIGNED_WORD = 3'd4,
-            UNSIGNED_HALF_WORD  = 3'd5,
-            UNSIGNED_BYTE  = 3'd6;
+            UNSIGNED_BYTE  = 3'd4,
+            UNSIGNED_WORD = 3'd5,
+            UNSIGNED_HALF_WORD  = 3'd6;
 
   logic [6:0] opcode;
   logic [2:0] funct3;
@@ -74,7 +74,7 @@ module pipeline_decode
 
   always_ff @ (posedge clk) begin
     if(ecall) begin
-      $display("ECALL at: %x", instruction_pc);
+      // $display("ECALL at: %x", instruction_pc);
     end
   end
 
@@ -494,7 +494,7 @@ module pipeline_decode
           r2_reg = 0;
           if(instruction_pc != 0) begin
             $display("UNKNOWN INSTRUCTION at PC: %h: %h", instruction_pc, instruction);
-            $finish();
+            // $finish();
           end
         end
       endcase

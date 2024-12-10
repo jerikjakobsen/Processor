@@ -62,8 +62,9 @@ module pipeline_ex
   logic [127:0] multiplication_result;
   assign operand2 = (imm_or_reg2) ? imm : r2_val;
 
-  logic tmp_signal;
-  assign tmp_signal = instruction_pc == 64'h4bc8c; // 63'h22f40;
+  logic tmp_signal, tmp2_signal;
+  assign tmp_signal = instruction_pc == 64'h1aa6c; // 63'h22f40;
+  assign tmp2_signal = instruction_pc == 64'h1ab24;
 
   always_comb begin
     ready = (opcode == 0 || next_stage_ready);

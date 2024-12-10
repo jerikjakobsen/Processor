@@ -2,9 +2,29 @@
 .globl _start
  
 _start:
-    li ra, -1
-    slliw x2, x1, 8
-
+    lui	x5,0x98
+   addiw	x5,x5,1536
+   lui	x6,0x449
+   addiw	x6,x6,-1843
+  slli	x6,x6,0xe
+  addi	x6,x6,1109 # 449455 <_start+0x449455>
+  slli	x6,x6,0xc
+  addi	x6,x6,1639
+  slli	x6,x6,0xc
+  addi	x6,x6,1928
+  sd	x6,0(x5) # 98000 <_start+0x98000>
+  lui	x7,0x26
+  addiw	x7,x7,1707
+  slli	x7,x7,0xe
+  addi	x7,x7,-1076 # 25bcc <_start+0x25bcc>
+  sw	x7,8(x5)
+  lui	x8,0xe
+  addiw	x8,x8,-530
+  sh	x8,12(x5)
+  li	x9,255
+  sb	x9,14(x5)
+  li	x17,93
+  ecall
 .section .rodata
 rodata_example:
     .asciz  "Hello, world!"       # Null-terminated string

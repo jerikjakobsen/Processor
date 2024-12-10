@@ -21,21 +21,8 @@ module pipeline_fetch
     output wire bp_add_reg_value
 );
 
-  parameter IDLE = 2'd0,
-            READ = 2'd2;
-
-  logic [1:0] state, next_state;
-
   logic [6:0] opcode;
   logic [63:0] imm;
-
-  always_ff @ (posedge clk) begin
-    if (reset) begin
-      state <= IDLE;
-    end else begin
-      state <= next_state;
-    end
-  end
 
   always_comb begin
     S_R_ADDR = pc;
@@ -43,12 +30,13 @@ module pipeline_fetch
   end
 
   always_comb begin
+    bp_add_reg_value = 0;
+
     if(S_R_DATA_VALID) begin
       instruction = S_R_DATA;
       next_stage_pc = pc;
 
       opcode = instruction[6:0];
-      bp_add_reg_value = 0;
       case (opcode)
         7'b1100111: begin
           // JALR

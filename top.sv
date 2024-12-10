@@ -110,6 +110,10 @@ module top
   logic [DATA_WIDTH-1:0] wb_dst_val;
   logic wb_enable;
   logic ecall, next_ecall, ecall_done;
+  logic pending_write, next_pending_write;
+  logic [ADDR_WIDTH-1:0] pending_write_addr, next_pending_write_addr;
+  logic [DATA_WIDTH-1:0] pending_write_data, next_pending_write_data;
+  logic [1:0] pending_write_size, next_pending_write_size;
 
   // REGISTER FILE SIGNALS
   logic [4:0] rf_reg1;
@@ -174,7 +178,11 @@ module top
     .ecall(ecall),
     .ecall_done(ecall_done),
     .bp_reg(bp_reg),
-    .bp_val(bp_val)
+    .bp_val(bp_val),
+    .pending_write(pending_write),
+    .pending_write_addr(pending_write_addr),
+    .pending_write_data(pending_write_data),
+    .pending_write_size(pending_write_size)
   );
 
   LLC llc(
@@ -360,7 +368,11 @@ module top
     .S_W_COMPLETE(L1_D_S_W_COMPLETE),
 
     .ecall(ecall_mem),
-    .ecall_wb(next_ecall)
+    .ecall_wb(next_ecall),
+    .pending_write(next_pending_write),
+    .pending_write_addr(next_pending_write_addr),
+    .pending_write_data(next_pending_write_data),
+    .pending_write_size(next_pending_write_size)
   );
 
   
@@ -373,6 +385,10 @@ module top
       m_axi_acready <= 1;
     end else begin
       ecall <= next_ecall_ex ? next_ecall : 0;
+      pending_write <= next_pending_write;
+      pending_write_addr <= next_pending_write_addr;
+      pending_write_data <= next_pending_write_data;
+      pending_write_size <= next_pending_write_size;
 
       if(mem_ready) begin
           ex_res <= next_ex_res;

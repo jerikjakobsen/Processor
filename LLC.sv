@@ -211,7 +211,7 @@ always_comb begin
             S_W_COMPLETE = 0;
             if(m_axi_acvalid && m_axi_acsnoop == 63'hD) begin
                 if (cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
-                    next_cache[ac_addr_requested_index].state[1] = 0;
+                    // next_cache[ac_addr_requested_index].state[1] = 0;
                 end
             end else begin
                 if (line1_active && !service_line) begin // Handle line 1 (READ ONLY) Will Only come here if line1 address is a miss

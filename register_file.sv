@@ -17,7 +17,11 @@ module register_file
 	input wire [4:0] write_register,
 	output wire write_ready,
 	input wire ecall,
-	output wire ecall_done
+	output wire ecall_done,
+	input wire pending_write,
+    input wire [63:0] pending_write_addr,
+    input wire [63:0] pending_write_data,
+    input wire [1:0] pending_write_size
 );
 
 	parameter ECALL_IDLE = 2'd0,
@@ -31,6 +35,10 @@ module register_file
 		if(reset) begin
 			ecall_state <= ECALL_IDLE;
 		end else begin
+			if(pending_write) begin
+				do_pending_write(pending_write_addr, pending_write_data, 2**(pending_write_size));
+			end
+			
 			if(next_ecall_state == ECALL_IN_PROGRESS) begin
 				// $display("DOING ECALLL!!!!");
 				do_ecall(registers[17], registers[10], registers[11], registers[12], registers[13], registers[14], registers[15], registers[16], registers[10]);
@@ -48,13 +56,6 @@ module register_file
 				registers[i] <= 64'b0;
 			end
 			registers[2] <= stackptr;
-			/* TEMP CHANGES */
-			// registers[8] <= 63'h1000;
-			// registers[9] <= 63'h2000;
-			// registers[10] <= 63'h3000;
-			// registers[11] <= 63'hAAAAAAAAAAAA;
-			// registers[12] <= 63'hBBBBBBBBBBBB;
-			// registers[13] <= 63'hCCCCCCCCCCCC;
 		end else begin
 			if(write_enable) begin
 				registers[write_register] <= write_register == 0 ? 0 : write_value;	
