@@ -932,7 +932,7 @@ void Vtop::traceChgThis__7(Vtop__Syms* __restrict vlSymsp, VerilatedVcd* vcdp, u
 	vcdp->chgBus  (c+9617,(vlTOPp->top__DOT__if_stage__DOT__state),2);
 	vcdp->chgBus  (c+9618,(vlTOPp->top__DOT__mem_opcode_ex),32);
 	vcdp->chgBus  (c+9619,((7U & (IData)(vlTOPp->top__DOT__mem_operation_size_ex))),3);
-	vcdp->chgBit  (c+9620,((VL_ULL(0x16608) == vlTOPp->top__DOT__ex_instr_pc)));
+	vcdp->chgBit  (c+9620,((VL_ULL(0x4bc8c) == vlTOPp->top__DOT__ex_instr_pc)));
 	vcdp->chgBus  (c+9621,(vlTOPp->top__DOT__mem_stage__DOT__state),3);
     }
 }

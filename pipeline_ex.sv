@@ -63,7 +63,7 @@ module pipeline_ex
   assign operand2 = (imm_or_reg2) ? imm : r2_val;
 
   logic tmp_signal;
-  assign tmp_signal = instruction_pc == 64'h16608; // 63'h22f40;
+  assign tmp_signal = instruction_pc == 64'h4bc8c; // 63'h22f40;
 
   always_comb begin
     ready = (opcode == 0 || next_stage_ready);
@@ -242,8 +242,13 @@ module pipeline_ex
       JUMP: begin
         case(branch_type)
           JAL: begin
+            if(bp_target == instruction_pc + operand2) begin
+              jump_signal = 0;
+            end else begin
+              jump_signal = 1;
+              jump_pc = instruction_pc + operand2;
+            end
             jump_signal = 0;
-            // jump_pc = instruction_pc + operand2;
             ex_res = instruction_pc + 4;
           end
 
@@ -258,14 +263,28 @@ module pipeline_ex
           end
 
           BEQ: begin
-            if (r1_val != r2_val) begin
+            if(r1_val == r2_val) begin
+              if(bp_target == instruction_pc + imm) begin
+                jump_signal = 0;
+              end else begin
+                jump_signal = 1;
+                jump_pc = instruction_pc + imm;
+              end
+            end else begin
               jump_signal = 1;
               jump_pc = instruction_pc + 4;
             end
           end
           
           BNE: begin
-            if (r1_val == r2_val) begin
+            if(r1_val != r2_val) begin
+              if(bp_target == instruction_pc + imm) begin
+                jump_signal = 0;
+              end else begin
+                jump_signal = 1;
+                jump_pc = instruction_pc + imm;
+              end
+            end else begin
               jump_signal = 1;
               jump_pc = instruction_pc + 4;
             end
@@ -273,12 +292,26 @@ module pipeline_ex
           
           BLT: begin
             if(unsigned_op == 1) begin
-              if ($unsigned(r1_val) >= $unsigned(r2_val)) begin
+              if($unsigned(r1_val) < $unsigned(r2_val)) begin
+                if(bp_target == instruction_pc + imm) begin
+                  jump_signal = 0;
+                end else begin
+                  jump_signal = 1;
+                  jump_pc = instruction_pc + imm;
+                end
+              end else begin
                 jump_signal = 1;
                 jump_pc = instruction_pc + 4;
               end
             end else begin
-              if ($signed(r1_val) >= $signed(r2_val)) begin
+              if($signed(r1_val) < $signed(r2_val)) begin
+                if(bp_target == instruction_pc + imm) begin
+                  jump_signal = 0;
+                end else begin
+                  jump_signal = 1;
+                  jump_pc = instruction_pc + imm;
+                end
+              end else begin
                 jump_signal = 1;
                 jump_pc = instruction_pc + 4;
               end
@@ -287,12 +320,26 @@ module pipeline_ex
           
           BGE: begin
             if(unsigned_op == 1) begin
-              if ($unsigned(r1_val) < $unsigned(r2_val)) begin
+              if($unsigned(r1_val) >= $unsigned(r2_val)) begin
+                if(bp_target == instruction_pc + imm) begin
+                  jump_signal = 0;
+                end else begin
+                  jump_signal = 1;
+                  jump_pc = instruction_pc + imm;
+                end
+              end else begin
                 jump_signal = 1;
                 jump_pc = instruction_pc + 4;
               end
             end else begin
-              if ($signed(r1_val) < $signed(r2_val)) begin
+              if($signed(r1_val) >= $signed(r2_val)) begin
+                if(bp_target == instruction_pc + imm) begin
+                  jump_signal = 0;
+                end else begin
+                  jump_signal = 1;
+                  jump_pc = instruction_pc + imm;
+                end
+              end else begin
                 jump_signal = 1;
                 jump_pc = instruction_pc + 4;
               end

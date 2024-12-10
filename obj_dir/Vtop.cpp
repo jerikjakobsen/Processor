@@ -86,7 +86,7 @@ void Vtop::_initial__TOP__1(Vtop__Syms* __restrict vlSymsp) {
     vlTOPp->m_axi_arlen = 7U;
     // INITIAL at top.sv:161
     vlTOPp->m_axi_awlen = 7U;
-    // INITIAL at top.sv:508
+    // INITIAL at top.sv:516
     VL_WRITEF("Initializing top, entry point = 0x%x\n",
 	      64,vlTOPp->entry);
 }
@@ -9467,27 +9467,41 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__2(Vtop__Syms* __restrict vlSymsp) {
 			vlTOPp->top__DOT__ecall_ex 
 			    = vlTOPp->top__DOT__next_ecall_ex;
 			vlTOPp->top__DOT__r1_val = 
-			    ((((1U != (0x7fU & vlTOPp->top__DOT____Vcellinp__ex_stage__mem_opcode)) 
-			       & (2U != (0x7fU & vlTOPp->top__DOT____Vcellinp__ex_stage__mem_opcode))) 
-			      & ((IData)(vlTOPp->top__DOT__next_mem_dst_reg) 
-				 == (IData)(vlTOPp->top__DOT__rf_reg1)))
-			      ? vlTOPp->top__DOT__next_ex_res
-			      : (((IData)(vlTOPp->top__DOT__wb_enable) 
-				  & ((IData)(vlTOPp->top__DOT__wb_dst_reg) 
-				     == (IData)(vlTOPp->top__DOT__rf_reg1)))
-				  ? vlTOPp->top__DOT__wb_dst_val
-				  : vlTOPp->top__DOT__next_r1_val));
+			    ((0U == (IData)(vlTOPp->top__DOT__rf_reg1))
+			      ? VL_ULL(0) : ((((1U 
+						!= 
+						(0x7fU 
+						 & vlTOPp->top__DOT____Vcellinp__ex_stage__mem_opcode)) 
+					       & (2U 
+						  != 
+						  (0x7fU 
+						   & vlTOPp->top__DOT____Vcellinp__ex_stage__mem_opcode))) 
+					      & ((IData)(vlTOPp->top__DOT__next_mem_dst_reg) 
+						 == (IData)(vlTOPp->top__DOT__rf_reg1)))
+					      ? vlTOPp->top__DOT__next_ex_res
+					      : (((IData)(vlTOPp->top__DOT__wb_enable) 
+						  & ((IData)(vlTOPp->top__DOT__wb_dst_reg) 
+						     == (IData)(vlTOPp->top__DOT__rf_reg1)))
+						  ? vlTOPp->top__DOT__wb_dst_val
+						  : vlTOPp->top__DOT__next_r1_val)));
 			vlTOPp->top__DOT__r2_val = 
-			    ((((1U != (0x7fU & vlTOPp->top__DOT____Vcellinp__ex_stage__mem_opcode)) 
-			       & (2U != (0x7fU & vlTOPp->top__DOT____Vcellinp__ex_stage__mem_opcode))) 
-			      & ((IData)(vlTOPp->top__DOT__next_mem_dst_reg) 
-				 == (IData)(vlTOPp->top__DOT__rf_reg2)))
-			      ? vlTOPp->top__DOT__next_ex_res
-			      : (((IData)(vlTOPp->top__DOT__wb_enable) 
-				  & ((IData)(vlTOPp->top__DOT__wb_dst_reg) 
-				     == (IData)(vlTOPp->top__DOT__rf_reg2)))
-				  ? vlTOPp->top__DOT__wb_dst_val
-				  : vlTOPp->top__DOT__next_r2_val));
+			    ((0U == (IData)(vlTOPp->top__DOT__rf_reg2))
+			      ? VL_ULL(0) : ((((1U 
+						!= 
+						(0x7fU 
+						 & vlTOPp->top__DOT____Vcellinp__ex_stage__mem_opcode)) 
+					       & (2U 
+						  != 
+						  (0x7fU 
+						   & vlTOPp->top__DOT____Vcellinp__ex_stage__mem_opcode))) 
+					      & ((IData)(vlTOPp->top__DOT__next_mem_dst_reg) 
+						 == (IData)(vlTOPp->top__DOT__rf_reg2)))
+					      ? vlTOPp->top__DOT__next_ex_res
+					      : (((IData)(vlTOPp->top__DOT__wb_enable) 
+						  & ((IData)(vlTOPp->top__DOT__wb_dst_reg) 
+						     == (IData)(vlTOPp->top__DOT__rf_reg2)))
+						  ? vlTOPp->top__DOT__wb_dst_val
+						  : vlTOPp->top__DOT__next_r2_val)));
 		    }
 		}
 	    }
@@ -15684,11 +15698,24 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						    (VL_ULL(4) 
 						     + vlTOPp->top__DOT__ex_instr_pc);
 					    } else {
-						vlTOPp->top__DOT__jump_signal = 0U;
+						if (
+						    (vlTOPp->top__DOT__ex_bp_target 
+						     == 
+						     (vlTOPp->top__DOT__ex_instr_pc 
+						      + vlTOPp->top__DOT__ex_stage__DOT__operand2))) {
+						    vlTOPp->top__DOT__jump_signal = 0U;
+						} else {
+						    vlTOPp->top__DOT__jump_signal = 1U;
+						    vlTOPp->top__DOT__jump_pc 
+							= 
+							(vlTOPp->top__DOT__ex_instr_pc 
+							 + vlTOPp->top__DOT__ex_stage__DOT__operand2);
+						}
 						vlTOPp->top__DOT__next_ex_res 
 						    = 
 						    (VL_ULL(4) 
 						     + vlTOPp->top__DOT__ex_instr_pc);
+						vlTOPp->top__DOT__jump_signal = 0U;
 					    }
 					} else {
 					    vlTOPp->top__DOT__jump_signal = 0U;
@@ -15702,7 +15729,21 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						     == (IData)(vlTOPp->top__DOT__unsigned_op))) {
 						    if (
 							(vlTOPp->top__DOT__r1_val 
-							 < vlTOPp->top__DOT__r2_val)) {
+							 >= vlTOPp->top__DOT__r2_val)) {
+							if (
+							    (vlTOPp->top__DOT__ex_bp_target 
+							     == 
+							     (vlTOPp->top__DOT__ex_instr_pc 
+							      + vlTOPp->top__DOT__imm))) {
+							    vlTOPp->top__DOT__jump_signal = 0U;
+							} else {
+							    vlTOPp->top__DOT__jump_signal = 1U;
+							    vlTOPp->top__DOT__jump_pc 
+								= 
+								(vlTOPp->top__DOT__ex_instr_pc 
+								 + vlTOPp->top__DOT__imm);
+							}
+						    } else {
 							vlTOPp->top__DOT__jump_signal = 1U;
 							vlTOPp->top__DOT__jump_pc 
 							    = 
@@ -15711,7 +15752,21 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						    }
 						} else {
 						    if (
-							VL_LTS_IQQ(1,64,64, vlTOPp->top__DOT__r1_val, vlTOPp->top__DOT__r2_val)) {
+							VL_GTES_IQQ(1,64,64, vlTOPp->top__DOT__r1_val, vlTOPp->top__DOT__r2_val)) {
+							if (
+							    (vlTOPp->top__DOT__ex_bp_target 
+							     == 
+							     (vlTOPp->top__DOT__ex_instr_pc 
+							      + vlTOPp->top__DOT__imm))) {
+							    vlTOPp->top__DOT__jump_signal = 0U;
+							} else {
+							    vlTOPp->top__DOT__jump_signal = 1U;
+							    vlTOPp->top__DOT__jump_pc 
+								= 
+								(vlTOPp->top__DOT__ex_instr_pc 
+								 + vlTOPp->top__DOT__imm);
+							}
+						    } else {
 							vlTOPp->top__DOT__jump_signal = 1U;
 							vlTOPp->top__DOT__jump_pc 
 							    = 
@@ -15725,7 +15780,21 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						     == (IData)(vlTOPp->top__DOT__unsigned_op))) {
 						    if (
 							(vlTOPp->top__DOT__r1_val 
-							 >= vlTOPp->top__DOT__r2_val)) {
+							 < vlTOPp->top__DOT__r2_val)) {
+							if (
+							    (vlTOPp->top__DOT__ex_bp_target 
+							     == 
+							     (vlTOPp->top__DOT__ex_instr_pc 
+							      + vlTOPp->top__DOT__imm))) {
+							    vlTOPp->top__DOT__jump_signal = 0U;
+							} else {
+							    vlTOPp->top__DOT__jump_signal = 1U;
+							    vlTOPp->top__DOT__jump_pc 
+								= 
+								(vlTOPp->top__DOT__ex_instr_pc 
+								 + vlTOPp->top__DOT__imm);
+							}
+						    } else {
 							vlTOPp->top__DOT__jump_signal = 1U;
 							vlTOPp->top__DOT__jump_pc 
 							    = 
@@ -15734,7 +15803,21 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						    }
 						} else {
 						    if (
-							VL_GTES_IQQ(1,64,64, vlTOPp->top__DOT__r1_val, vlTOPp->top__DOT__r2_val)) {
+							VL_LTS_IQQ(1,64,64, vlTOPp->top__DOT__r1_val, vlTOPp->top__DOT__r2_val)) {
+							if (
+							    (vlTOPp->top__DOT__ex_bp_target 
+							     == 
+							     (vlTOPp->top__DOT__ex_instr_pc 
+							      + vlTOPp->top__DOT__imm))) {
+							    vlTOPp->top__DOT__jump_signal = 0U;
+							} else {
+							    vlTOPp->top__DOT__jump_signal = 1U;
+							    vlTOPp->top__DOT__jump_pc 
+								= 
+								(vlTOPp->top__DOT__ex_instr_pc 
+								 + vlTOPp->top__DOT__imm);
+							}
+						    } else {
 							vlTOPp->top__DOT__jump_signal = 1U;
 							vlTOPp->top__DOT__jump_pc 
 							    = 
@@ -15748,7 +15831,21 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 						 & (IData)(vlTOPp->top__DOT__branch_type))) {
 						if (
 						    (vlTOPp->top__DOT__r1_val 
-						     == vlTOPp->top__DOT__r2_val)) {
+						     != vlTOPp->top__DOT__r2_val)) {
+						    if (
+							(vlTOPp->top__DOT__ex_bp_target 
+							 == 
+							 (vlTOPp->top__DOT__ex_instr_pc 
+							  + vlTOPp->top__DOT__imm))) {
+							vlTOPp->top__DOT__jump_signal = 0U;
+						    } else {
+							vlTOPp->top__DOT__jump_signal = 1U;
+							vlTOPp->top__DOT__jump_pc 
+							    = 
+							    (vlTOPp->top__DOT__ex_instr_pc 
+							     + vlTOPp->top__DOT__imm);
+						    }
+						} else {
 						    vlTOPp->top__DOT__jump_signal = 1U;
 						    vlTOPp->top__DOT__jump_pc 
 							= 
@@ -15758,7 +15855,21 @@ void Vtop::_settle__TOP__4(Vtop__Syms* __restrict vlSymsp) {
 					    } else {
 						if (
 						    (vlTOPp->top__DOT__r1_val 
-						     != vlTOPp->top__DOT__r2_val)) {
+						     == vlTOPp->top__DOT__r2_val)) {
+						    if (
+							(vlTOPp->top__DOT__ex_bp_target 
+							 == 
+							 (vlTOPp->top__DOT__ex_instr_pc 
+							  + vlTOPp->top__DOT__imm))) {
+							vlTOPp->top__DOT__jump_signal = 0U;
+						    } else {
+							vlTOPp->top__DOT__jump_signal = 1U;
+							vlTOPp->top__DOT__jump_pc 
+							    = 
+							    (vlTOPp->top__DOT__ex_instr_pc 
+							     + vlTOPp->top__DOT__imm);
+						    }
+						} else {
 						    vlTOPp->top__DOT__jump_signal = 1U;
 						    vlTOPp->top__DOT__jump_pc 
 							= 
@@ -18280,11 +18391,24 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 						    (VL_ULL(4) 
 						     + vlTOPp->top__DOT__ex_instr_pc);
 					    } else {
-						vlTOPp->top__DOT__jump_signal = 0U;
+						if (
+						    (vlTOPp->top__DOT__ex_bp_target 
+						     == 
+						     (vlTOPp->top__DOT__ex_instr_pc 
+						      + vlTOPp->top__DOT__ex_stage__DOT__operand2))) {
+						    vlTOPp->top__DOT__jump_signal = 0U;
+						} else {
+						    vlTOPp->top__DOT__jump_signal = 1U;
+						    vlTOPp->top__DOT__jump_pc 
+							= 
+							(vlTOPp->top__DOT__ex_instr_pc 
+							 + vlTOPp->top__DOT__ex_stage__DOT__operand2);
+						}
 						vlTOPp->top__DOT__next_ex_res 
 						    = 
 						    (VL_ULL(4) 
 						     + vlTOPp->top__DOT__ex_instr_pc);
+						vlTOPp->top__DOT__jump_signal = 0U;
 					    }
 					} else {
 					    vlTOPp->top__DOT__jump_signal = 0U;
@@ -18298,7 +18422,21 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 						     == (IData)(vlTOPp->top__DOT__unsigned_op))) {
 						    if (
 							(vlTOPp->top__DOT__r1_val 
-							 < vlTOPp->top__DOT__r2_val)) {
+							 >= vlTOPp->top__DOT__r2_val)) {
+							if (
+							    (vlTOPp->top__DOT__ex_bp_target 
+							     == 
+							     (vlTOPp->top__DOT__ex_instr_pc 
+							      + vlTOPp->top__DOT__imm))) {
+							    vlTOPp->top__DOT__jump_signal = 0U;
+							} else {
+							    vlTOPp->top__DOT__jump_signal = 1U;
+							    vlTOPp->top__DOT__jump_pc 
+								= 
+								(vlTOPp->top__DOT__ex_instr_pc 
+								 + vlTOPp->top__DOT__imm);
+							}
+						    } else {
 							vlTOPp->top__DOT__jump_signal = 1U;
 							vlTOPp->top__DOT__jump_pc 
 							    = 
@@ -18307,7 +18445,21 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 						    }
 						} else {
 						    if (
-							VL_LTS_IQQ(1,64,64, vlTOPp->top__DOT__r1_val, vlTOPp->top__DOT__r2_val)) {
+							VL_GTES_IQQ(1,64,64, vlTOPp->top__DOT__r1_val, vlTOPp->top__DOT__r2_val)) {
+							if (
+							    (vlTOPp->top__DOT__ex_bp_target 
+							     == 
+							     (vlTOPp->top__DOT__ex_instr_pc 
+							      + vlTOPp->top__DOT__imm))) {
+							    vlTOPp->top__DOT__jump_signal = 0U;
+							} else {
+							    vlTOPp->top__DOT__jump_signal = 1U;
+							    vlTOPp->top__DOT__jump_pc 
+								= 
+								(vlTOPp->top__DOT__ex_instr_pc 
+								 + vlTOPp->top__DOT__imm);
+							}
+						    } else {
 							vlTOPp->top__DOT__jump_signal = 1U;
 							vlTOPp->top__DOT__jump_pc 
 							    = 
@@ -18321,7 +18473,21 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 						     == (IData)(vlTOPp->top__DOT__unsigned_op))) {
 						    if (
 							(vlTOPp->top__DOT__r1_val 
-							 >= vlTOPp->top__DOT__r2_val)) {
+							 < vlTOPp->top__DOT__r2_val)) {
+							if (
+							    (vlTOPp->top__DOT__ex_bp_target 
+							     == 
+							     (vlTOPp->top__DOT__ex_instr_pc 
+							      + vlTOPp->top__DOT__imm))) {
+							    vlTOPp->top__DOT__jump_signal = 0U;
+							} else {
+							    vlTOPp->top__DOT__jump_signal = 1U;
+							    vlTOPp->top__DOT__jump_pc 
+								= 
+								(vlTOPp->top__DOT__ex_instr_pc 
+								 + vlTOPp->top__DOT__imm);
+							}
+						    } else {
 							vlTOPp->top__DOT__jump_signal = 1U;
 							vlTOPp->top__DOT__jump_pc 
 							    = 
@@ -18330,7 +18496,21 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 						    }
 						} else {
 						    if (
-							VL_GTES_IQQ(1,64,64, vlTOPp->top__DOT__r1_val, vlTOPp->top__DOT__r2_val)) {
+							VL_LTS_IQQ(1,64,64, vlTOPp->top__DOT__r1_val, vlTOPp->top__DOT__r2_val)) {
+							if (
+							    (vlTOPp->top__DOT__ex_bp_target 
+							     == 
+							     (vlTOPp->top__DOT__ex_instr_pc 
+							      + vlTOPp->top__DOT__imm))) {
+							    vlTOPp->top__DOT__jump_signal = 0U;
+							} else {
+							    vlTOPp->top__DOT__jump_signal = 1U;
+							    vlTOPp->top__DOT__jump_pc 
+								= 
+								(vlTOPp->top__DOT__ex_instr_pc 
+								 + vlTOPp->top__DOT__imm);
+							}
+						    } else {
 							vlTOPp->top__DOT__jump_signal = 1U;
 							vlTOPp->top__DOT__jump_pc 
 							    = 
@@ -18344,7 +18524,21 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 						 & (IData)(vlTOPp->top__DOT__branch_type))) {
 						if (
 						    (vlTOPp->top__DOT__r1_val 
-						     == vlTOPp->top__DOT__r2_val)) {
+						     != vlTOPp->top__DOT__r2_val)) {
+						    if (
+							(vlTOPp->top__DOT__ex_bp_target 
+							 == 
+							 (vlTOPp->top__DOT__ex_instr_pc 
+							  + vlTOPp->top__DOT__imm))) {
+							vlTOPp->top__DOT__jump_signal = 0U;
+						    } else {
+							vlTOPp->top__DOT__jump_signal = 1U;
+							vlTOPp->top__DOT__jump_pc 
+							    = 
+							    (vlTOPp->top__DOT__ex_instr_pc 
+							     + vlTOPp->top__DOT__imm);
+						    }
+						} else {
 						    vlTOPp->top__DOT__jump_signal = 1U;
 						    vlTOPp->top__DOT__jump_pc 
 							= 
@@ -18354,7 +18548,21 @@ VL_INLINE_OPT void Vtop::_sequent__TOP__5(Vtop__Syms* __restrict vlSymsp) {
 					    } else {
 						if (
 						    (vlTOPp->top__DOT__r1_val 
-						     != vlTOPp->top__DOT__r2_val)) {
+						     == vlTOPp->top__DOT__r2_val)) {
+						    if (
+							(vlTOPp->top__DOT__ex_bp_target 
+							 == 
+							 (vlTOPp->top__DOT__ex_instr_pc 
+							  + vlTOPp->top__DOT__imm))) {
+							vlTOPp->top__DOT__jump_signal = 0U;
+						    } else {
+							vlTOPp->top__DOT__jump_signal = 1U;
+							vlTOPp->top__DOT__jump_pc 
+							    = 
+							    (vlTOPp->top__DOT__ex_instr_pc 
+							     + vlTOPp->top__DOT__imm);
+						    }
+						} else {
 						    vlTOPp->top__DOT__jump_signal = 1U;
 						    vlTOPp->top__DOT__jump_pc 
 							= 

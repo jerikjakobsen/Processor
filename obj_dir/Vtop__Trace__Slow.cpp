@@ -1534,7 +1534,7 @@ void Vtop::traceFullThis__1(Vtop__Syms* __restrict vlSymsp, VerilatedVcd* vcdp, 
 	vcdp->fullBus  (c+9617,(vlTOPp->top__DOT__if_stage__DOT__state),2);
 	vcdp->fullBus  (c+9618,(vlTOPp->top__DOT__mem_opcode_ex),32);
 	vcdp->fullBus  (c+9619,((7U & (IData)(vlTOPp->top__DOT__mem_operation_size_ex))),3);
-	vcdp->fullBit  (c+9620,((VL_ULL(0x16608) == vlTOPp->top__DOT__ex_instr_pc)));
+	vcdp->fullBit  (c+9620,((VL_ULL(0x4bc8c) == vlTOPp->top__DOT__ex_instr_pc)));
 	vcdp->fullBus  (c+9621,(vlTOPp->top__DOT__mem_stage__DOT__state),3);
 	vcdp->fullBit  (c+9622,(vlTOPp->clk));
 	vcdp->fullBit  (c+9623,(vlTOPp->reset));

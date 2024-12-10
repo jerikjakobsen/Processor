@@ -447,20 +447,28 @@ module top
             mem_operation_size_ex <= next_mem_operation_size_ex;
             ecall_ex <= next_ecall_ex;
 
-            if(next_mem_opcode != 1 && next_mem_opcode != 2 && next_mem_dst_reg == rf_reg1) begin
-              r1_val <= next_ex_res;
-            end else if(wb_enable && wb_dst_reg == rf_reg1) begin
-              r1_val <= wb_dst_val;
+            if(rf_reg1 == 0) begin
+              r1_val <= 0;
             end else begin
-              r1_val <= next_r1_val;
+              if(next_mem_opcode != 1 && next_mem_opcode != 2 && next_mem_dst_reg == rf_reg1) begin
+                r1_val <= next_ex_res;
+              end else if(wb_enable && wb_dst_reg == rf_reg1) begin
+                r1_val <= wb_dst_val;
+              end else begin
+                r1_val <= next_r1_val;
+              end
             end
 
-            if(next_mem_opcode != 1 && next_mem_opcode != 2 && next_mem_dst_reg == rf_reg2) begin
-              r2_val <= next_ex_res;
-            end else if(wb_enable && wb_dst_reg == rf_reg2) begin
-              r2_val <= wb_dst_val;
+            if(rf_reg2 == 0) begin
+              r2_val <= 0;
             end else begin
-              r2_val <= next_r2_val;
+              if(next_mem_opcode != 1 && next_mem_opcode != 2 && next_mem_dst_reg == rf_reg2) begin
+                r2_val <= next_ex_res;
+              end else if(wb_enable && wb_dst_reg == rf_reg2) begin
+                r2_val <= wb_dst_val;
+              end else begin
+                r2_val <= next_r2_val;
+              end
             end
           end        
         end
