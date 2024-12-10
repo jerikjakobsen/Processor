@@ -78,8 +78,8 @@ module L1_D #(
     logic [511:0] latched_w_data_buffer, next_latched_w_data_buffer;
     logic conflicting_tags;
 
-		logic tmp_signal;
-		assign tmp_signal = S_W_ADDR == 63'h841A0;
+    logic tmp_signal;
+    assign tmp_signal = S_W_ADDR == 63'h841A0;
 
     typedef struct packed {
         logic [DATA_SIZE-1:0] data;       // Data section (e.g., 512 bits)
@@ -197,9 +197,11 @@ always_comb begin
         IDLE: begin
             S_W_COMPLETE = 0;
             if(m_axi_acvalid && m_axi_acsnoop == 63'hD) begin
-                if (cache[ac_addr_requested_index].ways[0].valid && !cache[ac_addr_requested_index].ways[0].dirty && cache[ac_addr_requested_index].ways[0].tag == ac_addr_requested_tag) begin
+                if (cache[ac_addr_requested_index].ways[0].valid && cache[ac_addr_requested_index].ways[0].tag == ac_addr_requested_tag) begin
                     next_cache[ac_addr_requested_index].ways[0].valid = 0;
-                end else if (cache[ac_addr_requested_index].ways[1].valid && !cache[ac_addr_requested_index].ways[1].dirty && cache[ac_addr_requested_index].ways[1].tag == ac_addr_requested_tag) begin
+                end
+                
+                if (cache[ac_addr_requested_index].ways[1].valid && cache[ac_addr_requested_index].ways[1].tag == ac_addr_requested_tag) begin
                     next_cache[ac_addr_requested_index].ways[1].valid = 0;
                 end
             end else begin

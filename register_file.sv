@@ -9,6 +9,9 @@ module register_file
 	output wire [63:0] val1,
 	output wire [63:0] val2,
 
+	input wire [4:0] bp_reg,
+	output wire [63:0] bp_val,
+
 	input wire write_enable,
 	input wire [63:0] write_value,
 	input wire [4:0] write_register,
@@ -63,6 +66,7 @@ module register_file
 		write_ready = 1;
 		val1 = write_enable && write_register == reg1 ? write_value : registers[reg1];
 		val2 = write_enable && write_register == reg2 ? write_value : registers[reg2];
+		bp_val = write_enable && write_register == bp_reg ? write_value : registers[bp_reg];
 	end
 
 	always_comb begin

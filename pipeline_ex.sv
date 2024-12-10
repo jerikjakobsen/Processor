@@ -15,6 +15,7 @@ module pipeline_ex
     input wire [6:0] opcode,
     input wire [3:0] branch_type,
     input wire [ADDR_WIDTH-1:0] instruction_pc,
+    input wire [ADDR_WIDTH-1:0] bp_target,
     input wire [DATA_WIDTH-1:0] r1_val,
     input wire [DATA_WIDTH-1:0] r2_val,
     input wire signed [DATA_WIDTH-1:0] imm,
@@ -62,7 +63,7 @@ module pipeline_ex
   assign operand2 = (imm_or_reg2) ? imm : r2_val;
 
   logic tmp_signal;
-  assign tmp_signal = instruction_pc == 64'h1aa6c; // 63'h22f40;
+  assign tmp_signal = instruction_pc == 64'h16608; // 63'h22f40;
 
   always_comb begin
     ready = (opcode == 0 || next_stage_ready);
@@ -134,8 +135,6 @@ module pipeline_ex
             end else begin
               temp_result = r1_val[31:0] >> operand2;
             end
-
-            // temp_result = r1_val[31:0] >>> operand2;
             ex_res = $signed(temp_result[31:0]);
           end
         end else begin
@@ -148,7 +147,6 @@ module pipeline_ex
             end else begin
               ex_res = r1_val >> operand2;
             end
-            // ex_res = $unsigned($signed(r1_val) >>> operand2);
           end
         end
       end
@@ -244,55 +242,59 @@ module pipeline_ex
       JUMP: begin
         case(branch_type)
           JAL: begin
-            jump_signal = 1;
-            jump_pc = instruction_pc + operand2;
+            jump_signal = 0;
+            // jump_pc = instruction_pc + operand2;
             ex_res = instruction_pc + 4;
           end
 
           JALR: begin
-            jump_signal = 1;
-            jump_pc = r1_val + operand2;
+            if(bp_target == r1_val + operand2) begin
+              jump_signal = 0;
+            end else begin
+              jump_signal = 1;
+              jump_pc = r1_val + operand2;
+            end
             ex_res = instruction_pc + 4;
           end
 
           BEQ: begin
-            if (r1_val == r2_val) begin
+            if (r1_val != r2_val) begin
               jump_signal = 1;
-              jump_pc = instruction_pc + imm;
+              jump_pc = instruction_pc + 4;
             end
           end
           
           BNE: begin
-            if (r1_val != r2_val) begin
+            if (r1_val == r2_val) begin
               jump_signal = 1;
-              jump_pc = instruction_pc + imm;
+              jump_pc = instruction_pc + 4;
             end
           end
           
           BLT: begin
             if(unsigned_op == 1) begin
-              if ($unsigned(r1_val) < $unsigned(r2_val)) begin
+              if ($unsigned(r1_val) >= $unsigned(r2_val)) begin
                 jump_signal = 1;
-                jump_pc = instruction_pc + imm;
+                jump_pc = instruction_pc + 4;
               end
             end else begin
-              if ($signed(r1_val) < $signed(r2_val)) begin
+              if ($signed(r1_val) >= $signed(r2_val)) begin
                 jump_signal = 1;
-                jump_pc = instruction_pc + imm;
+                jump_pc = instruction_pc + 4;
               end
             end
           end
           
           BGE: begin
             if(unsigned_op == 1) begin
-              if ($unsigned(r1_val) >= $unsigned(r2_val)) begin
+              if ($unsigned(r1_val) < $unsigned(r2_val)) begin
                 jump_signal = 1;
-                jump_pc = instruction_pc + imm;
+                jump_pc = instruction_pc + 4;
               end
             end else begin
-              if ($signed(r1_val) >= $signed(r2_val)) begin
+              if ($signed(r1_val) < $signed(r2_val)) begin
                 jump_signal = 1;
-                jump_pc = instruction_pc + imm;
+                jump_pc = instruction_pc + 4;
               end
             end
           end

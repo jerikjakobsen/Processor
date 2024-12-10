@@ -11,6 +11,8 @@ module pipeline_decode
     input wire [(DATA_WIDTH/2)-1:0] instruction,
     input wire [ADDR_WIDTH-1:0] instruction_pc,
     output wire [ADDR_WIDTH-1:0] next_stage_pc,
+    input wire [ADDR_WIDTH-1:0] bp_target,
+    output wire [ADDR_WIDTH-1:0] next_bp_target,
     output wire [6:0] ex_opcode,
     output wire [3:0] branch_type,
     output wire [4:0] r1_reg,
@@ -67,11 +69,12 @@ module pipeline_decode
   always_comb begin
     ready = (instruction == 90 || next_stage_ready);
     next_stage_pc = instruction_pc;
+    next_bp_target = bp_target;
   end
 
   always_ff @ (posedge clk) begin
     if(ecall) begin
-      // $display("ECALL at: %x", instruction_pc);
+      $display("ECALL at: %x", instruction_pc);
     end
   end
 
@@ -475,6 +478,7 @@ module pipeline_decode
 
         7'b0001111: begin
           // FENCE
+          $display("FENCE at %x", instruction_pc);
           dst_reg = 0;
           ex_opcode = NOP;
           mem_opcode = 4;
@@ -498,52 +502,3 @@ module pipeline_decode
   end
 
 endmodule
-
-
-
-
-// 7'b0111011: begin
-//   funct3 = instruction[14:12];
-//   funct7 = instruction[31:25];
-//   mem_opcode = 3;
-//   case(funct3)
-//     3'b000: begin
-//       dst_reg = instruction[11:7];
-//       r1_reg = instruction[19:15];
-//       r2_reg = instruction[24:20];
-//       imm_or_reg2 = REG2;
-//       is_word_op = 1;
-
-//       case(funct7)
-//         // ADDW
-//         7'b0000000: begin
-//           ex_opcode = ADD;
-//         end
-
-//         // MULW
-//         7'b0000001: begin
-//           ex_opcode = MUL;
-//         end
-
-//         // SUBW
-//         7'b0100000: begin
-//           ex_opcode = SUB;
-//         end
-
-//         default: begin
-//           dst_reg = 0;
-//           ex_opcode = NOP;
-//           r1_reg = 0;
-//           r2_reg = 0;
-//         end
-//       endcase
-//     end 
-
-//     default: begin
-//       dst_reg = 0;
-//       ex_opcode = NOP;
-//       r1_reg = 0;
-//       r2_reg = 0;
-//     end
-//   endcase
-// end

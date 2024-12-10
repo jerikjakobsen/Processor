@@ -71,12 +71,19 @@ module top
   logic jump_signal, jump_signal_applied;
   logic id_ready, ex_ready, mem_ready;
 
+  // IF -> Reg
+  logic [4:0] bp_reg;
+	logic [63:0] bp_val;
+  logic bp_add_reg_value;
+
   // IF -> ID
   logic [(DATA_WIDTH/2)-1:0] instruction, next_instruction;
   logic [ADDR_WIDTH-1:0] id_instr_pc, next_id_instr_pc;
+  logic [ADDR_WIDTH-1:0] id_bp_target;
 
   // ID -> EX
   logic [ADDR_WIDTH-1:0] ex_instr_pc, next_ex_instr_pc;
+  logic [ADDR_WIDTH-1:0] ex_bp_target, next_ex_bp_target;
   logic [6:0] ex_opcode, next_ex_opcode;
   logic [3:0] branch_type, next_branch_type;
   logic [DATA_WIDTH-1:0] r1_val, next_r1_val;
@@ -165,7 +172,9 @@ module top
     .write_value(wb_dst_val),
     .write_register(wb_dst_reg),
     .ecall(ecall),
-    .ecall_done(ecall_done)
+    .ecall_done(ecall_done),
+    .bp_reg(bp_reg),
+    .bp_val(bp_val)
   );
 
   LLC llc(
@@ -266,7 +275,10 @@ module top
     .S_R_ADDR(L1_I_S_R_ADDR),
     .S_R_ADDR_VALID(L1_I_S_R_ADDR_VALID),
     .S_R_DATA(L1_I_S_R_DATA),
-    .S_R_DATA_VALID(L1_I_S_R_DATA_VALID)
+    .S_R_DATA_VALID(L1_I_S_R_DATA_VALID),
+
+    .bp_reg(bp_reg),
+    .bp_add_reg_value(bp_add_reg_value)
   );
 
   pipeline_decode id_stage(
@@ -276,7 +288,9 @@ module top
     .next_stage_ready(ex_ready),
     .instruction(instruction),
     .instruction_pc(id_instr_pc),
+    .bp_target(id_bp_target),
     .next_stage_pc(next_ex_instr_pc),
+    .next_bp_target(next_ex_bp_target),
     .ex_opcode(next_ex_opcode),
     .branch_type(next_branch_type),
     .ecall(next_ecall_ex),
@@ -301,6 +315,7 @@ module top
     .opcode(ex_opcode),
     .branch_type(branch_type),
     .instruction_pc(ex_instr_pc),
+    .bp_target(ex_bp_target),
     .r1_val(r1_val),
     .r2_val(r2_val),
     .imm(imm),
@@ -374,6 +389,7 @@ module top
           ex_opcode <= 0; // NOP
           branch_type <= 0;
           ex_instr_pc <= 0;
+          ex_bp_target <= 0;
           r1_val <= 0;
           r2_val <= 0;
           imm <= 0;
@@ -390,6 +406,7 @@ module top
             ex_opcode <= 6'b111111;
             branch_type <= 0;
             ex_instr_pc <= 0;
+            ex_bp_target <= 0;
             r1_val <= 0;
             r2_val <= 0;
             imm <= 0;
@@ -405,6 +422,7 @@ module top
             ex_opcode <= 6'b111111;
             branch_type <= 0;
             ex_instr_pc <= 0;
+            ex_bp_target <= 0;
             r1_val <= 0;
             r2_val <= 0;
             imm <= 0;
@@ -419,6 +437,7 @@ module top
             ex_opcode <= next_ex_opcode;
             branch_type <= next_branch_type;
             ex_instr_pc <= next_ex_instr_pc;
+            ex_bp_target <= next_ex_bp_target;
             imm <= next_imm;
             ex_dst_reg <= next_ex_dst_reg;
             imm_or_reg2 <= next_imm_or_reg2;
@@ -467,16 +486,19 @@ module top
             pc <= jump_pc;
             instruction <= 0; // NOP
             id_instr_pc <= 0;
+            id_bp_target <= 0;
             jump_signal_applied <= 1;
           end else begin
-            pc <= next_if_pc;
+            pc <= bp_add_reg_value ? bp_val + next_if_pc : next_if_pc;
             instruction <= next_instruction;
             id_instr_pc <= next_id_instr_pc;
+            id_bp_target <= bp_add_reg_value ? bp_val + next_if_pc : next_if_pc;
           end
         end else if(jump_signal && !jump_signal_applied) begin
           pc <= jump_pc;
           instruction <= 0;
           id_instr_pc <= 0;
+          id_bp_target <= 0;
           jump_signal_applied <= 1;
         end
       end
