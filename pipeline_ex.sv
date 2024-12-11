@@ -64,7 +64,7 @@ module pipeline_ex
 
   logic tmp_signal, tmp2_signal;
   assign tmp_signal = instruction_pc == 64'h1aa6c; // 63'h22f40;
-  assign tmp2_signal = instruction_pc == 64'h1ab24;
+  assign tmp2_signal = instruction_pc == 64'h102ec;
 
   always_comb begin
     ready = (opcode == 0 || next_stage_ready);
@@ -82,7 +82,8 @@ module pipeline_ex
       ADD: begin
         jump_signal = 0;
         if(is_word_op) begin
-          ex_res[31:0] = r1_val[31:0] + operand2[31:0];
+          // ex_res[31:0] = r1_val[31:0] + operand2[31:0];
+          ex_res = r1_val + operand2;
           ex_res = {{32{ex_res[31]}}, ex_res[31:0]};
         end else begin
           ex_res = r1_val + operand2;
@@ -92,7 +93,8 @@ module pipeline_ex
       SUB: begin
         jump_signal = 0;
         if(is_word_op) begin
-          ex_res[31:0] = r1_val[31:0] - operand2[31:0];
+          // ex_res[31:0] = r1_val[31:0] - operand2[31:0];
+          ex_res = r1_val - operand2;
           ex_res = {{32{ex_res[31]}}, ex_res[31:0]};
         end else begin
           ex_res = r1_val - operand2;
@@ -117,7 +119,8 @@ module pipeline_ex
       SHIFT_LEFT: begin
         jump_signal = 0;
         if(is_word_op) begin
-          temp_result = r1_val[31:0] << operand2;
+          // temp_result = r1_val[31:0] << operand2;
+          temp_result = r1_val << operand2;
           ex_res = $signed(temp_result[31:0]);
         end else begin
           ex_res = r1_val << operand2;
@@ -132,9 +135,11 @@ module pipeline_ex
           end else begin
             if (r1_val[63]) begin
               // Sign-extend MSBs on right shift
-              temp_result = (r1_val[31:0] >> operand2) | ~((1 << (64 - operand2)) - 1);
+              // temp_result = (r1_val[31:0] >> operand2) | ~((1 << (64 - operand2)) - 1);
+              temp_result = (r1_val >> operand2) | ~((1 << (64 - operand2)) - 1);
             end else begin
-              temp_result = r1_val[31:0] >> operand2;
+              // temp_result = r1_val[31:0] >> operand2;
+              temp_result = r1_val >> operand2;
             end
             ex_res = $signed(temp_result[31:0]);
           end
@@ -164,10 +169,12 @@ module pipeline_ex
       MUL: begin
         jump_signal = 0;
         if(is_word_op) begin
-          temp_result = $signed(r1_val[31:0]) * $signed(operand2[31:0]);
-          ex_res = {{32{temp_result[31]}}, temp_result[31:0]};
+          // temp_result = $signed(r1_val[31:0]) * $signed(operand2[31:0]);
+          // ex_res = {{32{temp_result[31]}}, temp_result[31:0]};
+          multiplication_result = $signed(r1_val) * $signed(operand2);
+          ex_res = {{32{multiplication_result[31]}}, multiplication_result[31:0]};
         end else begin
-          multiplication_result = r1_val * operand2;
+          multiplication_result = $signed(r1_val) * $signed(operand2);
           ex_res = multiplication_result[63:0];
         end
       end
@@ -189,10 +196,14 @@ module pipeline_ex
         if(operand2 != 0) begin
           if(is_word_op) begin
             if(unsigned_op == 1) begin
-              temp_result = $unsigned(r1_val[31:0]) / $unsigned(operand2[31:0]);
-              ex_res = {32'b0, temp_result[31:0]};
+              // temp_result = $unsigned(r1_val[31:0]) / $unsigned(operand2[31:0]);
+              // ex_res = {{32{1'b0}}, temp_result[31:0]};
+              temp_result = $unsigned(r1_val) / $unsigned(operand2);
+              ex_res = {{32{1'b0}}, temp_result[31:0]};
             end else begin
-              temp_result = $signed(r1_val[31:0]) / $signed(operand2[31:0]);
+              // temp_result = $signed(r1_val[31:0]) / $signed(operand2[31:0]);
+              // ex_res = $signed(temp_result[31:0]);
+              temp_result = $signed(r1_val) / $signed(operand2);
               ex_res = $signed(temp_result[31:0]);
             end
           end else begin
@@ -212,10 +223,12 @@ module pipeline_ex
         if(operand2 != 0) begin
           if(is_word_op) begin
             if(unsigned_op == 1) begin
-              temp_result = $unsigned(r1_val[31:0]) % $unsigned(operand2[31:0]);
-              ex_res = {32'b0, temp_result[31:0]};
+              // temp_result = $unsigned(r1_val[31:0]) % $unsigned(operand2[31:0]);
+              temp_result = $unsigned(r1_val) % $unsigned(operand2);
+              ex_res = {{32{1'b0}}, temp_result[31:0]};
             end else begin
-              temp_result = $signed(r1_val[31:0]) % $signed(operand2[31:0]);
+              // temp_result = $signed(r1_val[31:0]) % $signed(operand2[31:0]);
+              temp_result = $signed(r1_val) % $signed(operand2);
               ex_res = $signed(temp_result[31:0]);
             end
           end else begin

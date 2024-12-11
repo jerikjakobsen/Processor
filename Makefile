@@ -1,6 +1,6 @@
 .PHONY: all run clean submit
 
-PROG=/shared/cse502/tests/project/prog1
+PROG=/shared/cse502/tests/project/prog2
 # PROG=/home/kuchadha/cse_502_cpu/tests/test1.o
 # PROG=/shared/cse502/tests/wp1/prog1.o
 # PROG=/shared/cse502/tests/wp1/prog1.o
@@ -26,7 +26,7 @@ obj_dir/Vtop.mk: $(VFILES) $(CFILES)
 	-LDFLAGS -lncurses -LDFLAGS -lelf -LDFLAGS -lrt
 
 run: obj_dir/Vtop
-	cd obj_dir/ && env HAVETLB=$(HAVETLB) FULLSYSTEM=$(FULLSYSTEM) ./Vtop $(PROG)
+	cd obj_dir/ && env HAVETLB=$(HAVETLB) FULLSYSTEM=$(FULLSYSTEM) ./Vtop $(PROG) 3
 
 clean:
 	rm -rf obj_dir/ dramsim2/results trace.vcd core 

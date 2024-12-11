@@ -100,6 +100,7 @@ module pipeline_decode
             imm_or_reg2 = IMM;
             dst_reg = instruction[11:7];
             r1_reg = instruction[19:15];
+            r2_reg = 0;
             unsigned_op = 0;
             is_word_op = 0;
 
@@ -131,18 +132,18 @@ module pipeline_decode
                 end
                 3'b001: begin // SLLI
                   ex_opcode = SHIFT_LEFT;
-                  imm = {{58{1'b0}}, instruction[24:20]};
+                  imm = {{57{1'b0}}, instruction[25:20]};
                 end
                 3'b101: begin
                   case (funct7)
                     7'b0000000: begin // SRLI
                       ex_opcode = SHIFT_RIGHT;
-                      imm = {{58{1'b0}}, instruction[24:20]};
+                      imm = {{57{1'b0}}, instruction[25:20]};
                       unsigned_op = 1;
                     end
                     7'b0100000: begin // SRAI
                       ex_opcode = SHIFT_RIGHT;
-                      imm = {{58{1'b0}}, instruction[24:20]};
+                      imm = {{57{1'b0}}, instruction[25:20]};
                     end
                   endcase
                 end
@@ -165,6 +166,7 @@ module pipeline_decode
           imm_or_reg2 = IMM;
           dst_reg = instruction[11:7];
           r1_reg = instruction[19:15];
+          r2_reg = 0;
 
           case(funct3)
             3'b000: begin // ADDIW
@@ -294,7 +296,9 @@ module pipeline_decode
             end
             7'b0000001: begin
               case (funct3)
-                3'b000: ex_opcode = MUL;   // MULW
+                3'b000: begin
+                  ex_opcode = MUL;
+                end   // MULW
                 3'b100: ex_opcode = DIV;   // DIVW
                 3'b101: begin              // DIVUW
                   ex_opcode = DIV;
@@ -351,6 +355,8 @@ module pipeline_decode
           mem_opcode = 3;
           branch_type = JAL;
           dst_reg = instruction[11:7];
+          r2_reg = 0;
+          r1_reg = 0;
           imm_or_reg2 = IMM;
           imm[20] = instruction[31];
           imm[10:1] = instruction[30:21];
@@ -409,6 +415,7 @@ module pipeline_decode
           funct3 = instruction[14:12];
           
           r1_reg = instruction[19:15];
+          r2_reg = 0;
           imm = {{52{instruction[31]}}, instruction[31:20]};
           imm_or_reg2 = IMM;
           is_word_op = 0;
