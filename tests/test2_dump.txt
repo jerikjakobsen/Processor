@@ -1,0 +1,21 @@
+
+tests/test2.o:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000000000000 <_start>:
+   0:	00000297          	auipc	t0,0x0
+   4:	00028293          	mv	t0,t0
+   8:	06300313          	li	t1,99
+   c:	0062b023          	sd	t1,0(t0) # 0 <_start>
+  10:	0002b383          	ld	t2,0(t0)
+  14:	fedff06f          	j	0 <_start>
+
+Disassembly of section .data:
+
+0000000000000000 <value>:
+   0:	002a                	0x2a
+   2:	0000                	unimp
+   4:	0000                	unimp
+	...

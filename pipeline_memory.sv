@@ -29,7 +29,12 @@ module pipeline_memory
     output wire [DATA_WIDTH-1:0] S_W_DATA,
     output wire [3:0] S_W_SIZE,
     input wire S_W_READY,
-    input wire S_W_COMPLETE
+    input wire S_W_COMPLETE,
+
+    output wire is_store,
+    output wire [63:0] store_addr,
+    output wire [63:0] store_data,
+    output wire [1:0] store_size
 );
   parameter IDLE = 3'd0,
             READ_REQUEST = 3'd1,
@@ -40,9 +45,10 @@ module pipeline_memory
             HALF_WORD  = 3'd1,
             WORD = 3'd2,
             DOUBLE_WORD = 3'd3,
-            UNSIGNED_WORD = 3'd4,
+            UNSIGNED_BYTE = 3'd4,
             UNSIGNED_HALF_WORD  = 3'd5,
-            UNSIGNED_BYTE  = 3'd6;
+            UNSIGNED_WORD  = 3'd6,
+            UNSIGNED_DOUBLE_WORD = 3'd7;
 
   logic [2:0] state, next_state;
   logic tmp_signal, tmp2_signal;
@@ -58,7 +64,7 @@ module pipeline_memory
     end
 
     if(state == WRITE_REQUEST && S_W_COMPLETE) begin
-      do_pending_write(S_W_ADDR, S_W_DATA, 2**(S_W_SIZE[1:0]));
+      // do_pending_write(S_W_ADDR, S_W_DATA, 2**(S_W_SIZE[1:0]));
 
       
       // case(mem_operation_size)
@@ -115,6 +121,7 @@ module pipeline_memory
 
     case(state)
       IDLE: begin
+        is_store = 0;
         wb_enable = 0;
         if(opcode == 0) begin
           next_state = IDLE;
@@ -138,6 +145,7 @@ module pipeline_memory
       end
 
       READ: begin
+        is_store = 0;
         if (S_R_DATA_VALID) begin
             next_state = IDLE;
             wb_enable = 1;
@@ -182,8 +190,13 @@ module pipeline_memory
         if(S_W_COMPLETE) begin
           next_state = IDLE;
           ready = 1;
+          is_store = 1;
+          store_addr = ex_res;
+          store_data = r2_val;
+          store_size = mem_operation_size[1:0];
         end else begin
           next_state = WRITE_REQUEST;
+          is_store = 0;
         end
       end
     endcase

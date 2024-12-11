@@ -147,8 +147,8 @@ module LLC #(
       S1_R_DATA = r1_selected_data;
       S2_R_DATA = r2_selected_data;
 
-      S1_R_DATA_VALID = (r1_selected_tag == r1_requested_tag && r1_selected_block_is_valid);
-      S2_R_DATA_VALID = (r2_selected_tag == r2_requested_tag && r2_selected_block_is_valid);
+      S1_R_DATA_VALID = (r1_selected_tag == r1_requested_tag && r1_selected_block_is_valid); //  && !(m_axi_acvalid && m_axi_acsnoop == 63'hD)
+      S2_R_DATA_VALID = (r2_selected_tag == r2_requested_tag && r2_selected_block_is_valid); 
 
       // Write Signals
       w_requested_tag = S_W_ADDR[OFFSET_SIZE+INDEX_SIZE+TAG_SIZE-1:OFFSET_SIZE+INDEX_SIZE];
@@ -200,17 +200,25 @@ module LLC #(
     end
   end
 
+  logic snoop_test;
+  assign snoop_test = m_axi_acvalid && m_axi_acsnoop == 63'hD && cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag && state != IDLE;
+
 always_comb begin
     if (!latched_s_w_contains_request && S_W_VALID) begin
         next_latched_s_w_contains_request = 1;
         next_latched_s_w_request_data = S_W_DATA;
         next_latched_s_w_request_addr = S_W_ADDR;
     end
+    if(m_axi_acvalid && m_axi_acsnoop == 63'hD) begin
+        if (cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
+            next_cache[ac_addr_requested_index].state[1] = 0;
+        end
+    end
     case (state)
         IDLE: begin
             S_W_COMPLETE = 0;
             if(m_axi_acvalid && m_axi_acsnoop == 63'hD) begin
-                if (cache[ac_addr_requested_index].state[1] && !cache[ac_addr_requested_index].state[0] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
+                if (cache[ac_addr_requested_index].state[1] && cache[ac_addr_requested_index].tag == ac_addr_requested_tag) begin
                     next_cache[ac_addr_requested_index].state[1] = 0;
                 end
             end else begin
@@ -307,9 +315,6 @@ always_comb begin
                 end
             end
         end
-        // AXI_R_DONE: begin
-            
-        // end
     endcase 
 end
 

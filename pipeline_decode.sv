@@ -56,9 +56,10 @@ module pipeline_decode
             HALF_WORD  = 3'd1,
             WORD = 3'd2,
             DOUBLE_WORD = 3'd3,
-            UNSIGNED_WORD = 3'd4,
+            UNSIGNED_BYTE = 3'd4,
             UNSIGNED_HALF_WORD  = 3'd5,
-            UNSIGNED_BYTE  = 3'd6;
+            UNSIGNED_WORD  = 3'd6,
+            UNSIGNED_DOUBLE_WORD = 3'd7;
 
   logic [6:0] opcode;
   logic [2:0] funct3;
@@ -111,7 +112,7 @@ module pipeline_decode
                 end
                 3'b011: begin // SLTIU
                   ex_opcode = SET_LESS_THAN;
-                  imm = {{52{instruction[31]}}, instruction[31:20]};
+                  imm = {{52{1'b0}}, instruction[31:20]};
                   unsigned_op = 1;
                 end
                 3'b100: begin // XORI
@@ -128,18 +129,18 @@ module pipeline_decode
                 end
                 3'b001: begin // SLLI
                   ex_opcode = SHIFT_LEFT;
-                  imm = {{58{1'b0}}, instruction[24:20]};
+                  imm = {{57{1'b0}}, instruction[25:20]};
                 end
                 3'b101: begin
                   case (funct7)
                     7'b0000000: begin // SRLI
                       ex_opcode = SHIFT_RIGHT;
-                      imm = {{58{1'b0}}, instruction[24:20]};
+                      imm = {{57{1'b0}}, instruction[25:20]};
                       unsigned_op = 1;
                     end
                     7'b0100000: begin // SRAI
                       ex_opcode = SHIFT_RIGHT;
-                      imm = {{58{1'b0}}, instruction[24:20]};
+                      imm = {{57{1'b0}}, instruction[25:20]};
                     end
                   endcase
                 end
@@ -421,6 +422,9 @@ module pipeline_decode
             3'b010: begin
               mem_operation_size = WORD;
             end
+            3'b011: begin
+              mem_operation_size = DOUBLE_WORD;
+            end
             3'b100: begin
               mem_operation_size = UNSIGNED_BYTE;
             end
@@ -429,9 +433,6 @@ module pipeline_decode
             end
             3'b110: begin
               mem_operation_size = UNSIGNED_WORD;
-            end
-            3'b011: begin
-              mem_operation_size = DOUBLE_WORD;
             end
           endcase
         end

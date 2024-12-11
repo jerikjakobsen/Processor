@@ -14,7 +14,12 @@ module register_file
 	input wire [4:0] write_register,
 	output wire write_ready,
 	input wire ecall,
-	output wire ecall_done
+	output wire ecall_done,
+
+	input wire is_store,
+    input wire [63:0] store_addr,
+    input wire [63:0] store_data,
+    input wire [1:0] store_size
 );
 
 	parameter ECALL_IDLE = 2'd0,
@@ -23,11 +28,21 @@ module register_file
 
 	logic [63:0] registers [31:0];
 	logic [2:0] ecall_state, next_ecall_state;
-
+	logic pending_write; 
+	logic pending_and_ecall;
+	assign pending_and_ecall = pending_write && next_ecall_state == ECALL_IN_PROGRESS;
+	logic wr_ecall;
+	assign wr_ecall = write_enable && next_ecall_state == ECALL_IN_PROGRESS;
 	always_ff @(posedge clk) begin
 		if(reset) begin
 			ecall_state <= ECALL_IDLE;
 		end else begin
+			if (is_store) begin
+				do_pending_write(store_addr, store_data, 2**(store_size));
+				pending_write <= 1;
+			end else begin
+				pending_write <= 0; 
+			end
 			if(next_ecall_state == ECALL_IN_PROGRESS) begin
 				// $display("DOING ECALLL!!!!");
 				do_ecall(registers[17], registers[10], registers[11], registers[12], registers[13], registers[14], registers[15], registers[16], registers[10]);

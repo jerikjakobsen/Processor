@@ -62,7 +62,7 @@ module pipeline_ex
   assign operand2 = (imm_or_reg2) ? imm : r2_val;
 
   logic tmp_signal;
-  assign tmp_signal = instruction_pc == 64'h1aa6c; // 63'h22f40;
+  assign tmp_signal = instruction_pc == 64'h26a04; // 63'h22f40;
 
   always_comb begin
     ready = (opcode == 0 || next_stage_ready);
@@ -80,7 +80,7 @@ module pipeline_ex
       ADD: begin
         jump_signal = 0;
         if(is_word_op) begin
-          ex_res[31:0] = r1_val[31:0] + operand2[31:0];
+          ex_res[31:0] = r1_val + operand2;
           ex_res = {{32{ex_res[31]}}, ex_res[31:0]};
         end else begin
           ex_res = r1_val + operand2;
@@ -90,7 +90,7 @@ module pipeline_ex
       SUB: begin
         jump_signal = 0;
         if(is_word_op) begin
-          ex_res[31:0] = r1_val[31:0] - operand2[31:0];
+          ex_res[31:0] = r1_val - operand2;
           ex_res = {{32{ex_res[31]}}, ex_res[31:0]};
         end else begin
           ex_res = r1_val - operand2;

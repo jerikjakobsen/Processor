@@ -138,7 +138,7 @@ module L1_D #(
         if (cache[r_requested_index].ways[0].tag == r_requested_tag && cache[r_requested_index].ways[0].valid) begin
             S_R_DATA = cache[r_requested_index].ways[0].data[(r_requested_offset + 8)*8-1 -:64];
             S_R_DATA_VALID = 1;
-        end else if (cache[r_requested_index].ways[1].tag == r_requested_tag && cache[r_requested_index].ways[1].valid) begin
+        end else if (cache[r_requested_index].ways[1].tag == r_requested_tag && cache[r_requested_index].ways[1].valid) begin // !(m_axi_acvalid && m_axi_acsnoop == 63'hD)
             S_R_DATA = cache[r_requested_index].ways[1].data[(r_requested_offset + 8)*8-1 -:64];
             S_R_DATA_VALID = 1;
         end else begin
@@ -193,13 +193,20 @@ always_comb begin
         next_latched_s_w_request_addr = S_W_ADDR;
         next_latched_s_w_request_size = S_W_SIZE;
     end
+    if(m_axi_acvalid && m_axi_acsnoop == 63'hD) begin
+        if (cache[ac_addr_requested_index].ways[0].valid && cache[ac_addr_requested_index].ways[0].tag == ac_addr_requested_tag) begin
+            next_cache[ac_addr_requested_index].ways[0].valid = 0;
+        end else if (cache[ac_addr_requested_index].ways[1].valid && cache[ac_addr_requested_index].ways[1].tag == ac_addr_requested_tag) begin
+            next_cache[ac_addr_requested_index].ways[1].valid = 0;
+        end
+    end
     case (state) 
         IDLE: begin
             S_W_COMPLETE = 0;
             if(m_axi_acvalid && m_axi_acsnoop == 63'hD) begin
-                if (cache[ac_addr_requested_index].ways[0].valid && !cache[ac_addr_requested_index].ways[0].dirty && cache[ac_addr_requested_index].ways[0].tag == ac_addr_requested_tag) begin
+                if (cache[ac_addr_requested_index].ways[0].valid && cache[ac_addr_requested_index].ways[0].tag == ac_addr_requested_tag) begin
                     next_cache[ac_addr_requested_index].ways[0].valid = 0;
-                end else if (cache[ac_addr_requested_index].ways[1].valid && !cache[ac_addr_requested_index].ways[1].dirty && cache[ac_addr_requested_index].ways[1].tag == ac_addr_requested_tag) begin
+                end else if (cache[ac_addr_requested_index].ways[1].valid && cache[ac_addr_requested_index].ways[1].tag == ac_addr_requested_tag) begin
                     next_cache[ac_addr_requested_index].ways[1].valid = 0;
                 end
             end else begin

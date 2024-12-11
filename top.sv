@@ -143,6 +143,11 @@ module top
 
   logic tmp_signal, tmp3_signal;
 
+  	logic is_store, next_is_store;
+    logic [63:0] store_addr, next_store_addr;
+    logic [63:0] store_data, next_store_data;
+    logic [1:0] store_size, next_store_size;
+
   assign tmp_signal = pc == 63'h296ac; // 63'h22fac;// 63'h22f9c; // 63'h22f40; // 63'h1e730;
   assign tmp3_signal = m_axi_acaddr == 63'h3fbffe68;
 
@@ -165,7 +170,11 @@ module top
     .write_value(wb_dst_val),
     .write_register(wb_dst_reg),
     .ecall(ecall),
-    .ecall_done(ecall_done)
+    .ecall_done(ecall_done),
+    .is_store(is_store),
+    .store_addr(store_addr),
+    .store_data(store_data),
+    .store_size(store_size)
   );
 
   LLC llc(
@@ -345,7 +354,12 @@ module top
     .S_W_COMPLETE(L1_D_S_W_COMPLETE),
 
     .ecall(ecall_mem),
-    .ecall_wb(next_ecall)
+    .ecall_wb(next_ecall),
+
+    .is_store(next_is_store),
+    .store_addr(next_store_addr),
+    .store_data(next_store_data),
+    .store_size(next_store_size)
   );
 
   
@@ -358,6 +372,10 @@ module top
       m_axi_acready <= 1;
     end else begin
       ecall <= next_ecall_ex ? next_ecall : 0;
+      is_store <= next_is_store;
+      store_addr <= next_store_addr;
+      store_data <= next_store_data;
+      store_size <= next_store_size;
 
       if(mem_ready) begin
           ex_res <= next_ex_res;

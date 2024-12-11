@@ -1,0 +1,38 @@
+
+/home/jjakobsen/cse_502_cpu/tests/test1.o:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000000000000 <_start>:
+   0:	fe010113          	addi	sp,sp,-32
+   4:	02010113          	addi	sp,sp,32
+   8:	00008067          	ret
+
+Disassembly of section .rodata:
+
+0000000000000000 <rodata_example>:
+   0:	6548                	ld	a0,136(a0)
+   2:	6c6c                	ld	a1,216(s0)
+   4:	77202c6f          	jal	s8,2776 <rodata_example+0x2776>
+   8:	646c726f          	jal	tp,c764e <rodata_example+0xc764e>
+   c:	0021                	0x21
+
+Disassembly of section .comment:
+
+0000000000000000 <.comment>:
+   0:	656e6547          	0x656e6547
+   4:	6172                	ld	sp,280(sp)
+   6:	6574                	ld	a3,200(a0)
+   8:	2064                	fld	fs1,192(s0)
+   a:	7962                	ld	s2,56(sp)
+   c:	7220                	ld	s0,96(a2)
+   e:	7369                	lui	t1,0xffffa
+  10:	34367663          	bleu	gp,a2,35c <_start+0x35c>
+  14:	752d                	lui	a0,0xfffeb
+  16:	6b6e                	ld	s6,216(sp)
+  18:	6f6e                	ld	t5,216(sp)
+  1a:	652d6e77          	0x652d6e77
+  1e:	666c                	ld	a1,200(a2)
+  20:	672d                	lui	a4,0xb
+  22:	00006363          	bltu	zero,zero,28 <_start+0x28>
