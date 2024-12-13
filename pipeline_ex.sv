@@ -126,14 +126,10 @@ module pipeline_ex
         jump_signal = 0;
         if(is_word_op) begin
           if(unsigned_op == 1) begin
-            ex_res = {{32{1'b0}}, (r1_val[31:0] >> operand2)};
+            temp_result = r1_val[31:0] >> operand2[4:0];
+            ex_res = $signed(temp_result[31:0]);
           end else begin
-            if (r1_val[63]) begin
-              // Sign-extend MSBs on right shift
-              temp_result = (r1_val[31:0] >> operand2) | ~((1 << (64 - operand2)) - 1);
-            end else begin
-              temp_result = r1_val[31:0] >> operand2;
-            end
+            temp_result = $signed(r1_val[31:0]) >>> $unsigned(operand2[4:0]);
 
             // temp_result = r1_val[31:0] >>> operand2;
             ex_res = $signed(temp_result[31:0]);
@@ -142,13 +138,7 @@ module pipeline_ex
           if(unsigned_op == 1) begin
             ex_res = r1_val >> operand2;
           end else begin
-            if (r1_val[63]) begin
-              // Sign-extend MSBs on right shift
-              ex_res = (r1_val >> operand2) | ~((1 << (64 - operand2)) - 1);
-            end else begin
-              ex_res = r1_val >> operand2;
-            end
-            // ex_res = $unsigned($signed(r1_val) >>> operand2);
+            temp_result = $signed(r1_val) >>> $unsigned(operand2[5:0]);
           end
         end
       end
@@ -191,7 +181,7 @@ module pipeline_ex
           if(is_word_op) begin
             if(unsigned_op == 1) begin
               temp_result = $unsigned(r1_val[31:0]) / $unsigned(operand2[31:0]);
-              ex_res = {32'b0, temp_result[31:0]};
+              ex_res = $signed(temp_result[31:0]);
             end else begin
               temp_result = $signed(r1_val[31:0]) / $signed(operand2[31:0]);
               ex_res = $signed(temp_result[31:0]);
@@ -214,7 +204,7 @@ module pipeline_ex
           if(is_word_op) begin
             if(unsigned_op == 1) begin
               temp_result = $unsigned(r1_val[31:0]) % $unsigned(operand2[31:0]);
-              ex_res = {32'b0, temp_result[31:0]};
+              ex_res = $signed(temp_result[31:0]);
             end else begin
               temp_result = $signed(r1_val[31:0]) % $signed(operand2[31:0]);
               ex_res = $signed(temp_result[31:0]);

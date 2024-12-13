@@ -132,13 +132,14 @@ module pipeline_decode
                   imm = {{57{1'b0}}, instruction[25:20]};
                 end
                 3'b101: begin
-                  imm = {{57{1'b0}}, instruction[25:20]};
                   case (instruction[31:26])
                     6'b000000: begin // SRLI
                       ex_opcode = SHIFT_RIGHT;
+                      imm = {{57{1'b0}}, instruction[25:20]};
                       unsigned_op = 1;
                     end
                     6'b010000: begin // SRAI
+                      imm = {{57{1'b0}}, instruction[25:20]};
                       ex_opcode = SHIFT_RIGHT;
                     end
                   endcase
