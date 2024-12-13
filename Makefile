@@ -6,7 +6,7 @@ PROG=/shared/cse502/tests/project/prog5
 # PROG=/shared/cse502/tests/wp1/prog1.o
 #PROG=/shared/cse502/tests/bbl.bin
 
-TRACE?=--trace
+TRACE?=
 HAVETLB=n
 FULLSYSTEM=n
 

@@ -17,7 +17,7 @@ module pipeline_ex
     input wire [ADDR_WIDTH-1:0] instruction_pc,
     input wire [DATA_WIDTH-1:0] r1_val,
     input wire [DATA_WIDTH-1:0] r2_val,
-    input wire signed [DATA_WIDTH-1:0] imm,
+    input wire [DATA_WIDTH-1:0] imm,
     input wire [4:0] dst_reg,
     input wire imm_or_reg2,
     input wire [31:0] mem_opcode,
@@ -126,19 +126,15 @@ module pipeline_ex
         jump_signal = 0;
         if(is_word_op) begin
           if(unsigned_op == 1) begin
-            temp_result = r1_val[31:0] >> operand2[4:0];
-            ex_res = $signed(temp_result[31:0]);
+            ex_res = r1_val[31:0] >> operand2[4:0];
           end else begin
-            temp_result = $signed(r1_val[31:0]) >>> $unsigned(operand2[4:0]);
-
-            // temp_result = r1_val[31:0] >>> operand2;
-            ex_res = $signed(temp_result[31:0]);
+            ex_res = $signed(r1_val[31:0]) >>> operand2[4:0];
           end
         end else begin
           if(unsigned_op == 1) begin
             ex_res = r1_val >> operand2;
           end else begin
-            temp_result = $signed(r1_val) >>> $unsigned(operand2[5:0]);
+            ex_res = $signed(r1_val) >>> operand2[5:0];
           end
         end
       end
@@ -177,47 +173,39 @@ module pipeline_ex
       
       DIV: begin
         jump_signal = 0;
-        if(operand2 != 0) begin
-          if(is_word_op) begin
-            if(unsigned_op == 1) begin
-              temp_result = $unsigned(r1_val[31:0]) / $unsigned(operand2[31:0]);
-              ex_res = $signed(temp_result[31:0]);
-            end else begin
-              temp_result = $signed(r1_val[31:0]) / $signed(operand2[31:0]);
-              ex_res = $signed(temp_result[31:0]);
-            end
+        if(is_word_op) begin
+          if(unsigned_op == 1) begin
+            temp_result = $unsigned(r1_val[31:0]) / $unsigned(operand2[31:0]);
+            ex_res = $signed(temp_result[31:0]);
           end else begin
-            if(unsigned_op == 1) begin
-              ex_res = $unsigned(r1_val) / $unsigned(operand2);
-            end else begin
-              ex_res = $signed(r1_val) / $signed(operand2);
-            end
+            temp_result = $signed(r1_val[31:0]) / $signed(operand2[31:0]);
+            ex_res = $signed(temp_result[31:0]);
           end
         end else begin
-          ex_res = 64'd0;
+          if(unsigned_op == 1) begin
+            ex_res = $unsigned(r1_val) / $unsigned(operand2);
+          end else begin
+            ex_res = $signed(r1_val) / $signed(operand2);
+          end
         end
       end
 
       REM: begin
         jump_signal = 0;
-        if(operand2 != 0) begin
-          if(is_word_op) begin
-            if(unsigned_op == 1) begin
-              temp_result = $unsigned(r1_val[31:0]) % $unsigned(operand2[31:0]);
-              ex_res = $signed(temp_result[31:0]);
-            end else begin
-              temp_result = $signed(r1_val[31:0]) % $signed(operand2[31:0]);
-              ex_res = $signed(temp_result[31:0]);
-            end
+        if(is_word_op) begin
+          if(unsigned_op == 1) begin
+            temp_result = $unsigned(r1_val[31:0]) % $unsigned(operand2[31:0]);
+            ex_res = $signed(temp_result[31:0]);
           end else begin
-            if(unsigned_op == 1) begin
-              ex_res = $unsigned(r1_val) % $unsigned(operand2);
-            end else begin
-              ex_res = $signed(r1_val) % $signed(operand2);
-            end
+            temp_result = $signed(r1_val[31:0]) % $signed(operand2[31:0]);
+            ex_res = $signed(temp_result[31:0]);
           end
         end else begin
-          ex_res = 64'd0;
+          if(unsigned_op == 1) begin
+            ex_res = $unsigned(r1_val) % $unsigned(operand2);
+          end else begin
+            ex_res = $signed(r1_val) % $signed(operand2);
+          end
         end
       end
 

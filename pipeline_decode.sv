@@ -16,7 +16,7 @@ module pipeline_decode
     output wire [4:0] r1_reg,
     output wire [4:0] r2_reg,
     output wire [4:0] dst_reg,
-    output wire signed [DATA_WIDTH-1:0] imm,
+    output wire [DATA_WIDTH-1:0] imm,
     output wire is_word_op,
     output wire [2:0] unsigned_op,
     output wire imm_or_reg2,
@@ -112,7 +112,7 @@ module pipeline_decode
                 end
                 3'b011: begin // SLTIU
                   ex_opcode = SET_LESS_THAN;
-                  imm = {{52{1'b0}}, instruction[31:20]};
+                  imm = {{52{instruction[31]}}, instruction[31:20]};
                   unsigned_op = 1;
                 end
                 3'b100: begin // XORI

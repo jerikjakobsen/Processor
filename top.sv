@@ -81,7 +81,7 @@ module top
   logic [3:0] branch_type, next_branch_type;
   logic [DATA_WIDTH-1:0] r1_val, next_r1_val;
   logic [DATA_WIDTH-1:0] r2_val, next_r2_val;
-  logic signed [DATA_WIDTH-1:0] imm, next_imm;
+  logic [DATA_WIDTH-1:0] imm, next_imm;
   logic is_word_op, next_is_word_op;
   logic [2:0] unsigned_op, next_unsigned_op;
   logic [4:0] ex_dst_reg, next_ex_dst_reg;
@@ -91,7 +91,7 @@ module top
   logic ecall_ex, next_ecall_ex;
 
   // EX -> MEM
-  logic signed [DATA_WIDTH-1:0] ex_res, next_ex_res; // signed
+  logic [DATA_WIDTH-1:0] ex_res, next_ex_res; // signed
   logic [DATA_WIDTH-1:0] r2_val_mem, next_r2_val_mem;
   logic [4:0] mem_dst_reg, next_mem_dst_reg;
   logic [6:0] mem_opcode, next_mem_opcode;
